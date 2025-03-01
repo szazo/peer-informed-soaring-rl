@@ -1,0 +1,287 @@
+defaults:
+  - job_config
+  - env/glider@train_env.env: base_multiglider
+  - env/glider@test_env.env: base_multiglider
+  - env/glider/air_velocity_field@train_env.env.air_velocity_field: multi_agent_thermal_wind_turbulence
+  - env/glider/air_velocity_field@test_env.env.air_velocity_field: multi_agent_thermal_wind_turbulence
+  - env/glider/aerodynamics@train_env.env.aerodynamics: train_glider
+  - env/glider/aerodynamics@test_env.env.aerodynamics: train_glider
+  - trainer: onpolicy
+  - trainer/stop_fn: mean_reward_stop
+  - model: multi_agent
+  - logger@model.non_learning.model_source_logger: neptune
+  - model@model.learning: ppo_multi_level_transformer
+  - model@model.learning.transformer_net: two_level_transformer
+  - model/ppo_policy/dist_fn@model.learning.ppo_policy.dist_fn: categorical
+  - model/optimizer@model.learning.optimizer: adam
+  - logger: neptune
+  - override hydra/job_logging: custom_logging
+  - _self_
+
+experiment_name: multi_agent_train
+
+device: max_memory_cuda
+logger:
+  project: szazo/glider
+  
+trainer:
+  max_epoch: 200
+  step_per_epoch: 60000
+  episode_per_collect: 40 # use episodes to ensure that reward estimation use full episodes
+  batch_size: 2048
+  repeat_per_collect: 5
+  episode_per_test: 100
+  stop_fn:
+    stop_mean_reward: 2600
+
+model:
+  non_learning:
+    device: cuda:1
+    model_source_logger:
+      project: szazo/glider
+      with_existing_id: ???
+      readonly: true
+  learning_agent_ids:
+    - student0
+  agent_observation_preprocessors:
+    teacher0: on
+    teacher1: on
+    teacher2: on
+    teacher3: on
+    teacher4: on
+    teacher5: on
+    teacher6: on
+    teacher7: on
+    teacher8: on
+    teacher9: on
+  learning:
+    transformer_net:
+        ego_sequence_transformer:
+          input_dim: 7
+          output_dim: 128
+          attention_internal_dim: 32
+          attention_head_num: 4
+          ffnn_hidden_dim: 128
+          ffnn_dropout_rate: 0.0
+          max_sequence_length: ${train_env.env.params.max_sequence_length}
+          embedding_dim: 128
+          encoder_layer_count: 1
+          enable_layer_normalization: false
+          enable_causal_attention_mask: true
+          is_reversed_sequence: true
+        peer_sequence_transformer:
+          input_dim: 7
+          output_dim: 128
+          attention_internal_dim: 32
+          attention_head_num: 4
+          ffnn_hidden_dim: 128
+          ffnn_dropout_rate: 0.0
+          max_sequence_length: ${train_env.env.params.max_sequence_length}
+          embedding_dim: 128
+          encoder_layer_count: 1
+          enable_layer_normalization: false
+          enable_causal_attention_mask: true
+          is_reversed_sequence: true
+        agent_transformer:
+          input_dim: ${model.learning.transformer_net.ego_sequence_transformer.output_dim}
+          output_dim: 128
+          attention_internal_dim: 32
+          attention_head_num: 4
+          ffnn_hidden_dim: 128
+          ffnn_dropout_rate: 0.0
+          max_sequence_length: ${train_env.env.params.max_closest_agent_count}
+          embedding_dim:
+          encoder_layer_count: 1
+          enable_layer_normalization: false
+          enable_causal_attention_mask: true
+          is_reversed_sequence: true
+    actor_critic_net:
+      action_space_n: 13
+      actor_hidden_sizes: [128, 128]
+      critic_hidden_sizes: [128, 128]
+      net_output_dim: 128
+    optimizer:
+      lr: 0.0004
+    ppo_policy:
+      discount_factor: 0.99
+      deterministic_eval: true
+      eps_clip: 0.2
+      vf_coef: 0.8
+      recompute_advantage: true
+      value_clip: false
+      dual_clip: 5.0
+      ent_coef: 0.02
+      gae_lambda: 0.85
+      advantage_normalization: true
+      max_batchsize: 256 # the maximum size of the batch when computing GAE (nograd)
+
+    
+  
+evaluators: {}
+  
+train_env:
+  vectorized:
+    count: 35
+    parallel: true
+  collector:
+    exploration_noise: false # there is no need, PPO do this using entropy
+    buffer_size: 100000 # in online policy, buffer will be cleared after every collect
+  env:
+    params:
+      max_closest_agent_count: 5
+      max_sequence_length: ???
+      agent_groups:
+        teacher:
+          terminate_if_finished: false
+          order: 0
+          spawner:
+            pool_size: 10
+            initial_time_offset_s_min_max: [0, 0]
+            parallel_num_min_max: [0, 4]
+            time_between_spawns_min_max_s: [30, 60]
+            must_spawn_if_no_global_agent: false
+          initial_conditions_params:
+            tangent_position_parameters:
+              starting_distance_from_tangent_position_m_normal_mean: 50.0
+              starting_distance_from_tangent_position_m_normal_sigma: 0.0
+              starting_distance_from_tangent_position_m_normal_sigma_k: 1.
+              tangent_distance_from_core_m_normal_mean: 10.0
+              tangent_distance_from_core_m_normal_sigma: 0.
+              tangent_distance_from_core_m_normal_sigma_k: 1.
+            altitude_earth_m_mean: 400.0
+            altitude_earth_m_sigma: 50.0
+            altitude_earth_m_sigma_k: 2.5            
+        student:
+          terminate_if_finished: true
+          order: 1
+          spawner:
+            pool_size: 1
+            initial_time_offset_s_min_max: [30, 90]
+            parallel_num_min_max: [1, 1]
+            time_between_spawns_min_max_s: [1, 1]
+            must_spawn_if_no_global_agent: true
+          initial_conditions_params:
+            tangent_position_parameters:
+              increase_distance_with_every_generation_by: 3.
+              starting_distance_from_tangent_position_m_normal_mean: 350.0
+              starting_distance_from_tangent_position_m_normal_sigma: 0.0
+              starting_distance_from_tangent_position_m_normal_sigma_k: 1.
+              tangent_distance_from_core_m_normal_mean: 10.0
+              tangent_distance_from_core_m_normal_sigma: 0.
+              tangent_distance_from_core_m_normal_sigma_k: 1.
+            altitude_earth_m_mean: 400.0
+            altitude_earth_m_sigma: 50.0
+            altitude_earth_m_sigma_k: 2.5
+      simulation_box_params:
+        box_size: [5000,5000,2000]
+      reward_params:
+        success_reward: 0.
+        fail_reward: 0.
+        negative_reward_enabled: true
+        vertical_velocity_reward_enabled: true
+        new_maximum_altitude_reward_enabled: true
+      cutoff_params:
+        maximum_distance_from_core_m: 500.0
+        success_altitude_m: 1000.0
+        fail_altitude_m: 10.0
+        maximum_time_without_lift_s: 600.0
+        maximum_duration_s: 3000.0
+      time_params:
+        dt_s: 0.4
+        decision_dt_s: 0.8
+      discrete_continuous_mapping:
+        discrete_count: 13
+        low_deg: -45.0
+        high_deg: 45.0
+      glider_agent_params:
+        roll_control_dynamics_params:
+          system:
+            omega_natural_frequency: 0.2
+            zeta_damping_ratio: 0.5
+            k_process_gain: 1.
+          control:
+            proportional_gain: 15.
+            integral_gain: 0.66
+            derivative_gain: 40.
+        air_velocity_post_process:
+          velocity_noise:
+            x:
+              mean: 0.0
+              sigma: 0.01
+            y:
+              mean: 0.0
+              sigma: 0.01
+            z:
+              mean: 0.0
+              sigma: 0.01
+
+test_env:
+  vectorized:
+    count: 35
+    parallel: true
+  collector:
+    exploration_noise: false
+  env:
+    params:
+      max_closest_agent_count: ${train_env.env.params.max_closest_agent_count}
+      max_sequence_length: ${train_env.env.params.max_sequence_length}
+      agent_groups: ${train_env.env.params.agent_groups}
+      simulation_box_params:
+        box_size: [5000,5000,2000]
+      reward_params:
+        success_reward: 0.
+        fail_reward: 0.
+        negative_reward_enabled: true
+        vertical_velocity_reward_enabled: true
+        new_maximum_altitude_reward_enabled: true
+      cutoff_params:
+        maximum_distance_from_core_m: 500.0
+        success_altitude_m: 1000.0
+        fail_altitude_m: 10.0
+        maximum_time_without_lift_s: 600.0
+        maximum_duration_s: 3000.0
+      time_params:
+        dt_s: 0.4
+        decision_dt_s: 0.8
+      discrete_continuous_mapping:
+        discrete_count: 13
+        low_deg: -45.0
+        high_deg: 45.0
+      glider_agent_params:
+        roll_control_dynamics_params:
+          system:
+            omega_natural_frequency: 0.2
+            zeta_damping_ratio: 0.5
+            k_process_gain: 1.
+          control:
+            proportional_gain: 15.
+            integral_gain: 0.66
+            derivative_gain: 40.
+
+hydra:
+  job_logging:
+    loggers:
+      thermal.gaussian.make_gaussian_air_velocity_field:
+        level: DEBUG
+      TianshouTrainingJob:
+        level: DEBUG
+      LocalTensorBoardExperimentLogger:
+        level: DEBUG
+      utils.find_suitable_torch_device:
+        level: DEBUG
+      TianshouComparisonEvaluator:
+        level: DEBUG
+      TianshouEvaluator:
+        level: DEBUG
+      ObservationLogWrapper:
+        level: DEBUG
+      VectorizedObservationLogger:
+        level: DEBUG
+      VectorizedVideoRecorder:
+        level: DEBUG
+      BestWeightsSaver:
+        level: DEBUG
+      MultiAgentBestWeightsSaver:
+        level: DEBUG
+      SingleAgentBestWeightsSaver:
+        level: DEBUG

@@ -1,0 +1,85 @@
+defaults:
+  - job_config
+  - evaluator@evaluators.main: comparison
+  - env/glider@evaluators.main.env.env: base_singleglider
+  - env/glider/air_velocity_field@evaluators.main.env.env.air_velocity_field: test_thermal_wind_turbulence
+  - env/glider/aerodynamics@evaluators.main.env.env.aerodynamics: train_glider
+  - eval/initial_conditions@evaluators.main.env.env.params: common_initial_conditions
+  - env/observation_logger@evaluators.main.observation_logger.env: singleglider_observation_logger
+  - logger@model_source_logger: neptune
+  - logger@logger: local_tensorboard
+  - override hydra/job_logging: custom_logging
+  - _self_
+
+device: max_memory_cuda
+
+model_source_logger:
+  project: szazo/glider
+  with_existing_id: ???
+  readonly: true
+
+logger:
+  log_dir: ${hydra:runtime.output_dir}/tensorboard
+  flush_secs: 10
+
+evaluators:
+  main:
+    log_parent_key: eval_main
+    episode_count: 20
+    deterministic_comparison: true
+    deterministic_eval: true
+    compare_with_random_policy: false
+    create_video: false
+    observation_logger:
+      log_buffer_size: 100000
+      additional_columns:
+        agent_type: ai
+        training: ${model_source_logger.with_existing_id}
+    env:
+      vectorized:
+        count: 4
+        parallel: true
+      collector:
+        exploration_noise: false
+      env:
+        params:
+          max_sequence_length: ???
+          spatial_transformation: egocentric
+          egocentric_spatial_transformation:
+            relative_to: last
+            reverse: true
+          initial_conditions_params:
+            tangent_position_parameters:
+              starting_distance_from_tangent_position_m_normal_mean: 150.0
+              starting_distance_from_tangent_position_m_normal_sigma: 0.0
+              starting_distance_from_tangent_position_m_normal_sigma_k: 1.
+              tangent_distance_from_core_m_normal_mean: 10.0
+              tangent_distance_from_core_m_normal_sigma: 0.0
+              tangent_distance_from_core_m_normal_sigma_k: 1.
+            altitude_earth_m_mean: 400.0
+            altitude_earth_m_sigma: 0.0
+            altitude_earth_m_sigma_k: 1.
+
+hydra:
+  job_logging:
+    loggers:
+      VectorizedObservationLogger:
+        level: DEBUG
+      VectorizedVideoRecorder:
+        level: DEBUG
+      TianshouEvaluationJob:
+        level: DEBUG
+      TianshouEvaluator:
+        level: DEBUG
+      TianshouComparisonEvaluator:
+        level: DEBUG
+      thermal.realistic.make_stacked_decomposed_realistic_air_velocity_field:
+        level: DEBUG
+      MultirunHydraStatisticsConcatCallback:
+        level: DEBUG
+      GliderInitialConditionsCalculator:
+        level: DEBUG
+      GliderInitialTangentPosition:
+        level: DEBUG
+      TianshouVectorizedCollectorFactory:
+        level: DEBUG

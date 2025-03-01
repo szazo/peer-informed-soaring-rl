@@ -1,0 +1,30 @@
+# @package _global_
+defaults:
+  - multi_agent_eval_policy_multirun_config
+  - _self_
+
+
+evaluators:
+  main:
+    env:
+      env:
+        params:
+          agent_groups:
+            teacher:
+              spawner:
+                pool_size: 10
+                initial_time_offset_s_min_max: [0, 0]
+                parallel_num_min_max: [1, 4]
+                time_between_spawns_min_max_s: [30, 60]
+                must_spawn_if_no_global_agent: true
+            student:
+              spawner:
+                pool_size: 1
+                initial_time_offset_s_min_max: [10, 90]
+                parallel_num_min_max: [1, 1]
+                time_between_spawns_min_max_s: [1, 1]
+                must_spawn_if_no_global_agent: true
+              initial_conditions_params:
+                tangent_position_parameters:
+                  starting_distance_from_tangent_position_m_normal_mean: 350.0
+                  tangent_distance_from_core_m_normal_mean: 250.0

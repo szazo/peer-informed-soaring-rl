@@ -1,0 +1,33 @@
+defaults:
+  - multi_agent_eval_policy_config
+  # - override hydra/launcher: bird_ray
+  - override logger@logger: local_tensorboard_logger
+  - _self_
+
+model_source_logger:
+  with_existing_id: ???
+
+evaluators:
+  main:
+    # seed: 45
+    episode_count: 1
+    env:
+      env:
+        params:
+          max_closest_agent_count: ???
+          max_sequence_length: ???
+hydra:
+  sweeper:
+    params:
+      +eval/gaussian/models/multi_agent_policy: glob(*) # glob(multi_agent_policy_eval1*) #glob(*) # 
+
+  callbacks:
+    merge_observation_logs:
+      _target_: utils.multirun_hydra_statistics_concat_callback.MultirunHydraStatisticsConcatCallback
+      input:
+        filepath: eval/main/observation_log.csv
+        index_column:
+        header: 0
+      output:
+        filename_prefix: merged_observation_log
+        target_dir: results/eval/gaussian/multi_agent_policy

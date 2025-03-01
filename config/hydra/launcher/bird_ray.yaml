@@ -1,0 +1,10 @@
+defaults:
+  - ray
+
+ray:
+  init:
+    num_gpus: 1
+    num_cpus: 16
+  remote:
+    num_gpus: 0.1
+    num_cpus: 8

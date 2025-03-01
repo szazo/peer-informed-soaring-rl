@@ -1,0 +1,23 @@
+version: 1
+
+formatters:
+  colorlog:
+    # https://github.com/facebookresearch/hydra/blob/main/plugins/hydra_colorlog/hydra_plugins/hydra_colorlog/conf/hydra/hydra_logging/colorlog.yaml
+    # https://github.com/borntyping/python-colorlog
+    '()': 'colorlog.ColoredFormatter'
+    format: "%(cyan)s%(asctime)s %(purple)s %(name)-12s %(log_color)s%(levelname)-6s%(reset)s %(blue)s%(message)s"
+  custom:
+    format: '%(asctime)s %(name)-12s %(levelname)-6s %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: colorlog
+    stream: ext://sys.stdout
+  file:
+    class: logging.FileHandler
+    formatter: custom
+    filename: ${hydra.runtime.output_dir}/${hydra.job.name}.log
+root:
+  handlers: [console,file]
+  level: INFO
+disable_existing_loggers: false

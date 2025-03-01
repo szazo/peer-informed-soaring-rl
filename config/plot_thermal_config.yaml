@@ -1,0 +1,53 @@
+defaults:
+  - experiment_config
+  - env/glider/air_velocity_field@air_velocity_field: train_thermal_wind_turbulence
+  - override hydra/job_logging: custom_logging
+  - _self_
+
+show_plots_in_cli: true
+fig_size: [12,6.75]
+horizontal_cross_section: true
+vertical_cross_section: true
+show_title: true
+show_axes_title: true
+show_w_min_max: true
+
+# air_velocity_field:
+#    random_state:
+#      generator_name: PCG64
+#      encoded_state_values: gASVLgAAAAAAAABdlChLAEsAihAn_7Kv6xn7ofDpCJt9plI4ihFhp4PcrUkQwHMUpUiywICrAGUu
+plot_config:
+  horizontal:
+    box:
+      sample_altitude_m: 1100
+      spacing_m: 1.
+      box_size_xy_m: [300,300]
+    plot:
+      major_locator_gap_m: 50
+  vertical:
+    box:
+      altitude_range_m: [0, 1400]
+      spacing_m: 1.
+      box_size_xyz_m:
+      center_xyz_m:
+    plot:
+      projection: 'XZ'
+      projection_type: 'follow_core'
+      horizontal_major_locator_gap_m: 200
+      horizontal_minor_locator_gap_count: 4
+      vertical_major_locator_gap_m: 200
+      vertical_minor_locator_gap_count: 4
+
+hydra:
+  job_logging:
+    loggers:
+      StackedRealisticAirVelocityFieldAdapter:
+        level: DEBUG
+      StackedDecomposedRealisticAirVelocityField:
+        level: DEBUG
+      RealisticAirVelocityFieldRayAdapter:
+        level: DEBUG
+      StackedDecomposedRealisticGaussianFilterAdapter:
+        level: DEBUG
+      NoiseFieldGenerator:
+        level: DEBUG

@@ -1,0 +1,50 @@
+defaults:
+  - base_gaussian
+
+box_size: [6050, 6050, 2050]
+turbulence_episode_regenerate_probability: 0.1
+
+thermal:
+  # maximum radius
+  max_r_m_normal_mean: 60.0
+  max_r_m_normal_sigma: 25.0
+
+  # altitude of the maximum radius
+  max_r_altitude_m_normal_mean: 1000.0
+  max_r_altitude_m_normal_sigma: 100.0
+
+  # spread of the maximum radius around the maximum radius altitude
+  max_r_m_sigma_normal_mean: 1500.0
+  max_r_m_sigma_normal_sigma: 100.0
+
+  # vertical velocity at the core
+  w_max_m_per_s_normal_mean: 3.0
+  w_max_m_per_s_normal_sigma: 1.5
+
+  # used for control that the specified sigma should contain the most of the bell volume: sigma'=sigma/k
+  sigma_k: 2.5
+  # because the thermal with the radius is gaussian, we use
+  # k for the radius too to limit distribution into the range of specified thermal radius
+  radius_k: 1.5
+
+turbulence:
+  noise_multiplier_normal_mean: 1.2
+  noise_multiplier_normal_sigma: 0.2
+  noise_gaussian_filter_sigma_normal_mean_m: 20.0
+  noise_gaussian_filter_sigma_normal_sigma_m: 5.0
+  noise_grid_spacing_m: 50.0
+  sigma_k: 2.5
+
+
+wind:
+  horizontal_wind_speed_at_2m_m_per_s_normal_mean: 1.2
+  horizontal_wind_speed_at_2m_m_per_s_normal_sigma: 0.2
+  horizontal_wind_profile_vertical_spacing_m: 100.0
+
+  noise:
+    noise_multiplier_normal_mean: 3.0
+    noise_multiplier_normal_sigma: 2.5
+    noise_gaussian_filter_sigma_normal_mean_m: 30.0
+    noise_gaussian_filter_sigma_normal_sigma_m: 10.0
+    noise_grid_spacing_m: 50.0
+    sigma_k: 2.5

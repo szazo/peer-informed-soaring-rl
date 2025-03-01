@@ -1,0 +1,11 @@
+# @package _global_
+defaults:
+- /eval/gaussian/air_velocity_fields@evaluators.main.env.env.air_velocity_field: eval45
+- _self_
+experiment_name: multi_agent_policy_eval45
+evaluators:
+  main:
+    observation_logger:
+      additional_columns:
+        thermal: eval45
+        bird_name: train_glider

@@ -1,0 +1,32 @@
+defaults:
+  - train_config
+  - _self_
+
+train_env:
+  env:
+    params:
+      initial_conditions_params:
+        tangent_position_parameters:
+          starting_distance_from_tangent_position_m_normal_sigma: 0.
+          starting_distance_from_tangent_position_m_normal_sigma_k: 1.
+          tangent_distance_from_core_m_normal_mean: 10.0
+          tangent_distance_from_core_m_normal_sigma: 0.
+          tangent_distance_from_core_m_normal_sigma_k: 1.
+
+test_env:
+  env:
+    params:
+      initial_conditions_params:
+        tangent_position_parameters:
+          starting_distance_from_tangent_position_m_normal_sigma: 0.
+          starting_distance_from_tangent_position_m_normal_sigma_k: 1.
+          starting_distance_from_tangent_position_m_normal_mean: ${train_env.env.params.initial_conditions_params.tangent_position_parameters.starting_distance_from_tangent_position_m_normal_mean}
+          tangent_distance_from_core_m_normal_mean: ${train_env.env.params.initial_conditions_params.tangent_position_parameters.tangent_distance_from_core_m_normal_mean}
+          tangent_distance_from_core_m_normal_sigma: 0.
+          tangent_distance_from_core_m_normal_sigma_k: 1.
+
+hydra:
+  sweeper:
+    params:
+      train_env.env.params.max_sequence_length: 3,6,15,25,50,75,80
+      train_env.env.params.initial_conditions_params.tangent_position_parameters.starting_distance_from_tangent_position_m_normal_mean: 150

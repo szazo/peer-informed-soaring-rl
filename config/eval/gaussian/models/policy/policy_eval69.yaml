@@ -1,0 +1,12 @@
+# @package _global_
+defaults:
+- /eval/gaussian/initial_conditions@evaluators.main.env.env.params: gaussian_thermal_initial_conditions
+- /eval/gaussian/air_velocity_fields@evaluators.main.env.env.air_velocity_field: eval69
+- _self_
+experiment_name: policy_eval69
+evaluators:
+  main:
+    observation_logger:
+      additional_columns:
+        thermal: eval69
+        bird_name: train_glider

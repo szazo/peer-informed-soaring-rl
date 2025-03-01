@@ -1,0 +1,31 @@
+defaults:
+  - eval_policy_config
+  # - override hydra/launcher: bird_ray
+  - _self_
+
+model_source_logger:
+  with_existing_id: ???
+
+evaluators:
+  main:
+    # seed: 46
+    episode_count: 1
+    env:
+      env:
+        params:
+          max_sequence_length: ???
+hydra:
+  sweeper:
+    params:
+      +eval/gaussian/models/policy: glob(*) # policy_eval0
+  
+  callbacks:
+    merge_observation_logs:
+      _target_: utils.multirun_hydra_statistics_concat_callback.MultirunHydraStatisticsConcatCallback
+      input:
+        filepath: eval/main/observation_log.csv
+        index_column:
+        header: 0
+      output:
+        filename_prefix: merged_observation_log
+        target_dir: results/eval/gaussian/multi_agent_policy

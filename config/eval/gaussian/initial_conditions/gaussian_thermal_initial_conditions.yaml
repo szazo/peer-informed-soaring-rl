@@ -1,0 +1,7 @@
+# @package _global_
+defaults:
+  - override /eval/initial_conditions@_here_: common_initial_conditions
+  - _self_
+
+simulation_box_params:
+  box_size: [5000,5000,2000]

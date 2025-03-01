@@ -1,0 +1,7 @@
+# @package _global_
+defaults:
+- override /env/glider/air_velocity_field@_here_: multi_agent_thermal_wind_turbulence
+- _self_
+random_state:
+  generator_name: PCG64
+  encoded_state_values: gASVLwAAAAAAAABdlChLAEsAihHyDdpnJYt79xzaGIZTpiiZAIoRCyyrRKSXqfLiJg1u5zsrqQBlLg==

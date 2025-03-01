@@ -1,0 +1,39 @@
+defaults:
+  - experiment_config
+  - custom_job@job: observation_log_player
+  - /env/glider/air_velocity_field@job.scene.air_velocity_field: multi_agent_thermal_wind_turbulence
+  - override hydra/job_logging: custom_logging
+  - _self_
+
+job:
+  observation_log_filepath: ???
+  scene:
+    start_scene: 0
+    start_episode: 0
+    start_time_s: 0.
+    timer_dt_ms: 200
+    playback_speed: 5
+    simulation_box:
+      box_size: [3000,3000,1600]
+    air_velocity_grid_spacing_m: 20.
+    minimum_vertical_velocity_m_per_s:
+    colormap_name: Set1
+    agent_color_index_map:
+      student0: 0
+      teacher0: 1
+      teacher1: 2
+      teacher2: 3
+      teacher3: 4
+      teacher4: 5
+      teacher5: 6
+      teacher6: 7
+      teacher7: 8
+      teacher8: 9
+      teacher9: 10
+      bird_train_glider: 1
+
+hydra:
+  job_logging:
+    loggers:
+      ObservationLogPlayerJob:
+        level: DEBUG
