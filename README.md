@@ -2,7 +2,7 @@
 
 ## Creating and activating virtual env
 
-1. Create a *virtual env* which uses Python 3.11 (**replace** `VENV_DIR` e.g. to `~/.envs/soaringrl`):
+1. Create a *virtual env* which uses Python 3.11 (**replace** `VENV_DIR` e.g. with `~/.envs/soaringrl`):
     ```bash
     pyenv install 3.11
     pyenv shell 3.11
@@ -27,10 +27,10 @@
 
 ## Experiment logger
 
-For logging the experiments and storing trained weights https://neptune.ai/[neptune.ai] is used.
+For logging the experiments and storing trained weights [neptune.ai](https://neptune.ai) is used.
 
-Create a new project and:
-1. set the workspace/project id in `config/logger/neptune_logger.yaml` after `project:`
+Create a new project in Neptune and:
+1. set the created project's workspace and project id in `config/logger/neptune_logger.yaml` after `project:`
 2. set the `NEPTUNE_API_TOKEN` environment variable e.g. in `.bashrc`, `.zshrc` (it can also be set in the config, but not recommended):
 
 ```bash
