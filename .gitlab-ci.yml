@@ -1,0 +1,10 @@
+stages:
+  - test
+
+test:
+  image: python:3.11
+  stage: test
+  before_script:
+    - python -m pip install --editable ".[dev]"
+  script:
+    - python -m pytest

@@ -1,5 +1,4 @@
 from model.transformer.multihead_attention2 import MultiheadAttention2
-from model.transformer.create_causal_attention_mask import create_causal_attention_mask
 import torch
 import numpy as np
 import scipy
@@ -100,10 +99,6 @@ def test_init_should_initialize_using_custom_initializer_when_set():
 
 def test_should_calculate_when_single_head_attention():
 
-    # from utils.logging import configure_logger
-
-    # configure_logger(debug_loggers=['MultiheadAttention2'])
-
     # given
     head_num = 1
     source_dim = 2
@@ -179,10 +174,6 @@ def test_should_sum_when_multi_head_with_same_params():
     # then
     assert np.allclose(output.detach().numpy(),
                        head_expected_output + head_expected_output)
-
-    #assert np.allclose(output.detach().numpy(), expected_output)
-    # https://stackoverflow.com/questions/76648620/how-do-i-implement-this-attention-layer-in-pytorch
-    #source_batched = torch.unsqueeze(source, dim=0)
 
 
 def test_should_sum_when_multi_head_with_different_params():
@@ -475,14 +466,12 @@ def _custom_range_param_init3_(query: torch.nn.ParameterList,
             assert query[i].shape == query_params[i].shape
             assert key[i].shape == key_params[i].shape
             assert value[i].shape == value_params[i].shape
-            # assert output[i].shape == output_params[i].shape
             assert output.shape == output_params_merged.shape
 
             query[i].copy_(torch.Tensor(query_params[i]))
             key[i].copy_(torch.Tensor(key_params[i]))
             value[i].copy_(torch.Tensor(value_params[i]))
             output.copy_(output_params_merged)
-            # output[i].copy_(torch.Tensor(output_params[i]))
 
 
 def _create_range_param2(head_num: int,
@@ -531,21 +520,6 @@ def _create_range_param(head_num: int,
 
         assert result is not None
         return result
-
-
-# def _custom_range_param_init_(query: torch.Tensor,
-#                            key: torch.Tensor,
-#                            value: torch.Tensor,
-#                            output: torch.Tensor):
-
-#     with torch.no_grad():
-#         query.copy_(create_range_param(query))
-#         key.copy_(create_range_param(key))
-#         value.copy_(create_range_param(value))
-#         output.copy_(create_range_param(output))
-
-# def create_range_param(for_tensor: torch.Tensor):
-#     return (torch.arange(1, for_tensor.numel() + 1) / 100.).reshape(for_tensor.shape)
 
 
 def _create_range_param_numpy(shape: tuple[int, int], start_at: int = 1):

@@ -2,8 +2,6 @@ defaults:
   - job_config
   - env/glider@train_env.env: base_singleglider
   - env/glider@test_env.env: base_singleglider
-  # - env/glider/air_velocity_filter@train_env.env.params.glider_agent_params.air_velocity_post_process.filter_kernel: exponential_kernel
-  # - env/glider/air_velocity_filter@test_env.env.params.glider_agent_params.air_velocity_post_process.filter_kernel: exponential_kernel
   - env/glider/air_velocity_field@train_env.env.air_velocity_field: train_thermal_wind_turbulence
   - env/glider/air_velocity_field@test_env.env.air_velocity_field: test_thermal_wind_turbulence
   - env/glider/aerodynamics@train_env.env.aerodynamics: train_glider
@@ -15,21 +13,17 @@ defaults:
   - model: ppo_custom_transformer
   - model/ppo_policy/dist_fn: categorical
   - model/optimizer: adam
-  - logger: neptune
+  - logger@logger: neptune_logger
   - override hydra/job_logging: custom_logging
   - _self_
 
 experiment_name: train
 
 device: max_memory_cuda
-logger:
-  project: szazo/glider
 
 trainer:
   max_epoch: 200
-  # ${training.train_env.vectorized.count * 2400}
   step_per_epoch: 60000
-  #step_per_collect: 18000
   episode_per_collect: 30 # use episodes to ensure that reward estimation use full episodes
   batch_size: 2048
   repeat_per_collect: 5
@@ -117,9 +111,6 @@ train_env:
             integral_gain: 0.66
             derivative_gain: 40.
         air_velocity_post_process:
-          # filter_kernel:
-          #   kernel_size: 10
-          #   alpha: 0.25
           velocity_noise:
             x:
               mean: 0.0
@@ -186,26 +177,12 @@ test_env:
             proportional_gain: 15.
             integral_gain: 0.66
             derivative_gain: 40.
-        # air_velocity_post_process:
-          # filter_kernel:
-          #   kernel_size: 10
-          #   alpha: 0.25
-          # velocity_noise:
-          #   x:
-          #     mean: 0.0
-          #     sigma: 0.1
-          #   y:
-          #     mean: 0.0
-          #     sigma: 0.1
-          #   z:
-          #     mean: 0.0
-          #     sigma: 0.1
 
 model:
   transformer_net:
     input_dim: 7
     output_dim: 64
-    attention_internal_dim: 64 # it is very important to be "large", this is the main communication (not 16)
+    attention_internal_dim: 64
     attention_head_num: 4
     ffnn_hidden_dim: 128
     ffnn_dropout_rate: 0.0
@@ -215,13 +192,14 @@ model:
     enable_layer_normalization: false
     enable_causal_attention_mask: true
     is_reversed_sequence: true
+    encoder_activation: relu
   actor_critic_net:
     action_space_n: 13
     actor_hidden_sizes: [128, 128]
     critic_hidden_sizes: [128, 128]
     net_output_dim: ${model.transformer_net.output_dim}
   optimizer:
-    lr: 0.0003 # decreased learning rate to avoid overshooting for larger model (I think)
+    lr: 0.0003
   ppo_policy:
     discount_factor: 0.99
     deterministic_eval: true
@@ -244,8 +222,6 @@ hydra:
         level: DEBUG
       LocalTensorBoardExperimentLogger:
         level: DEBUG
-      # NeptuneExperimentLogger:
-      #   level: DEBUG
       utils.find_suitable_torch_device:
         level: DEBUG
       TianshouComparisonEvaluator:
@@ -258,5 +234,3 @@ hydra:
         level: DEBUG
       VectorizedVideoRecorder:
         level: DEBUG
-      # NoiseField:
-      #   level: DEBUG

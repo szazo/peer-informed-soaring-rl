@@ -1,4 +1,3 @@
-from typing import List, Union
 import math
 import sys
 import numpy.typing as npt

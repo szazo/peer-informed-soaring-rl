@@ -2,13 +2,13 @@ defaults:
   - job_config
   - evaluator@evaluators.main: comparison
   - env/glider@evaluators.main.env.env: base_multiglider
-  - env/glider/air_velocity_field@evaluators.main.env.env.air_velocity_field: multi_agent_thermal_wind_turbulence.yaml
+  - env/glider/air_velocity_field@evaluators.main.env.env.air_velocity_field: multi_agent_thermal_wind
   - env/glider/aerodynamics@evaluators.main.env.env.aerodynamics: train_glider
     
   - eval/initial_conditions@evaluators.main.env.env.params: common_initial_conditions
     
   - env/observation_logger@evaluators.main.observation_logger.env: singleglider_observation_logger
-  - logger@model_source_logger: neptune
+  - logger@model_source_logger: neptune_logger
   - logger@logger: neptune_logger
   - override hydra/job_logging: custom_logging
   - _self_
@@ -18,7 +18,6 @@ experiment_name: multi_agent_eval
 device: cpu
 
 model_source_logger:
-  project: szazo/glider
   with_existing_id: ???
   readonly: true
 

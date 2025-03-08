@@ -27,10 +27,6 @@ class AgentInfoBatchProtocol(BatchProtocol, Protocol):
     agent_mask: list[bool]
 
 
-# class InfoBatchProtocol(BatchProtocol, Protocol, Generic[TAgentID]):
-#     agent_mask: dict[TAgentID, AgentInfoBatchProtocol]
-
-
 class ParallelMultiAgentBatchProtocol(BatchProtocol, Protocol,
                                       Generic[TAgentID]):
     """Observations of an environment that a policy can turn into actions.
@@ -55,11 +51,10 @@ class ParallelMultiAgentRolloutBatchProtocol(BatchProtocol, Protocol,
     info: dict[TAgentID, AgentInfoBatchProtocol]
 
 
-# TAgentObsPreprocessor = Callable[[Any], Any]
 TAgentObsPreprocessor = str
 
 
-# TODO: IMPLEMENT
+# TODO: implement custom preprocessors
 class PolicyObservationPreprocessor(ABC):
     pass
 
@@ -199,7 +194,6 @@ class ParallelMultiAgentPolicyManager(BasePolicy[MapTrainingStats],
             # preprocess the observation if required for the agent
             filtered_agent_obs = self._preprocess_agent_observation(
                 agent_id, filtered_agent_obs)
-            # print('PREPROCESS BATCH', filtered_agent_obs.shape)
 
             # get the agent's batch
             agent_batch = Batch(obs=filtered_agent_obs,
@@ -209,13 +203,10 @@ class ParallelMultiAgentPolicyManager(BasePolicy[MapTrainingStats],
             agent_policy = self._policies[agent_id]
 
             # execute the corresponding policy
-            # print('CALLING POLICY', agent_id, filtered_agent_obs.shape)
             agent_policy_result = agent_policy(batch=agent_batch, **kwargs)
-            # print('POLICY RESULT', agent_id, agent_policy_result)
 
             # create the action array which match the batch size
             act_shape = (batch_size, *agent_policy_result.act.shape[1:])
-            # print('act_shape', act_shape)
             act = np.full(act_shape, np.nan)
 
             # place into the per-agent action matrix as numpy values
@@ -225,14 +216,6 @@ class ParallelMultiAgentPolicyManager(BasePolicy[MapTrainingStats],
 
             act[agent_env_mask] = result_act
             new_agent_actions[agent_id] = act
-
-        # print('MAP', self._agent_id_to_index_map)
-        # action_array = self._convert_agent_actions_to_matrix(
-        #     batch_size=batch_size,
-        #     actions=new_agent_actions)
-
-        # print('NEW AGENT ACTIONS', new_agent_actions)
-        # print('ARRAY', action_array)
 
         result_batch = Batch({
             'act': new_agent_actions,
@@ -248,7 +231,6 @@ class ParallelMultiAgentPolicyManager(BasePolicy[MapTrainingStats],
         result = np.zeros((batch_size, len(self._agent_id_to_index_map)))
         for agent_id, action in actions.items():
             index = self._agent_id_to_index_map[agent_id]
-            # print('INDEX', index, action)
             result[:, index] = action
 
         return result
@@ -267,22 +249,14 @@ class ParallelMultiAgentPolicyManager(BasePolicy[MapTrainingStats],
         indices: np.ndarray,
     ) -> dict[TAgentID, RolloutBatchProtocol]:
 
-        # for each learning agent select the indices in the batch which they are present at
-        # learn_agents: list[TAgentID] = ['a0', 'a1', 'a2']
-        # learn_agents: list[TAgentID] = ['a0','a1', 'a2']
-        # learn_agents: list[TAgentID] = ['a1', 'a0', 'a2']
-
         results: dict[TAgentID, RolloutBatchProtocol] = {}
 
         for agent_id in self._learn_agent_ids:
-            # print('extracting agent', agent_id)
 
             agent_batch, mask = self._extract_agent_from_batch(agent_id, batch)
             if agent_batch is None:
                 # no data for the agent, skip
                 continue
-
-            # print('agent obs', agent_id, agent_batch.obs)
 
             assert mask is not None
 
@@ -326,7 +300,8 @@ class ParallelMultiAgentPolicyManager(BasePolicy[MapTrainingStats],
         if agent_id not in self._agent_observation_preprocessors:
             return obs
 
-        # HACK: need to implement agent specific preprocessor, here we just use the first
+        # TODO: need to implement agent specific preprocessor plugin,
+        # here we just use the first (the observation for self)
         first_agent_obs = obs[..., 0, :, :]
 
         return first_agent_obs
@@ -398,14 +373,6 @@ class ParallelMultiAgentPolicyManager(BasePolicy[MapTrainingStats],
 
         terminated = info_next.terminated
         truncated = info_next.truncated
-
-        # print('obs', obs)
-        # print('act', act)
-        # print('obs_next', obs_next)
-        # print('rew', rew)
-        # print('terminated', terminated)
-        # print('truncated', truncated)
-        # print('info_next', info_next)
 
         # determine the mask (it is based on the s_t-1)
         mask: np.ndarray = info_next['agent_mask_before']

@@ -10,7 +10,7 @@ class CommonNetCache(torch.nn.Module):
 
     _common_net: torch.nn.Module
     _output_dim: int
-    
+
     _last_input: torch.Tensor | None
     _last_output: torch.Tensor | None
     _last_output_hidden: torch.Tensor | None

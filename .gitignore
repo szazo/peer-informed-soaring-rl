@@ -1,0 +1,14 @@
+.virtual_documents
+*~
+.ipynb_checkpoints
+.gitman
+.dir-locals.el
+multirun
+outputs
+data
+optuna_data
+.neptune
+Vxyz_x=200_y=200_z=200_mu=5_x1=40_iteration=10000-99_100x3x200x200x200_chunked.h5
+__pycache__
+*#
+results

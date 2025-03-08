@@ -6,10 +6,11 @@ import logging
 from gymnasium.utils import seeding
 import tianshou
 import pandas as pd
-# from trainer.statistics import Statistics, StatisticsParameters
 from ..common import TianshouEnviromentParameters
 from .api import TianshouEvaluatorBase, ObservationLoggerParameters
-from .tianshou_evaluator import TianshouEvaluator, TianshouEvaluatorParameters, TianshouEvaluatorResult
+from .tianshou_evaluator import (TianshouEvaluator,
+                                 TianshouEvaluatorParameters,
+                                 TianshouEvaluatorResult)
 from ..experiment_logger import ExperimentLoggerInterface
 
 
@@ -25,7 +26,6 @@ class TianshouComparisonEvaluatorParameters:
     observation_logger: ObservationLoggerParameters | None
     seed: int | None = None
     create_video: bool = False
-    # statistics: StatisticsParameters | None = None
 
 
 @dataclass
@@ -93,12 +93,6 @@ class TianshouComparisonEvaluator(TianshouEvaluatorBase):
             self._log.debug('merging observation logs...')
             observation_log_df = self._merge_observation_logs(
                 policy_results=policy_results, output_dir=output_dir)
-
-            # # create statistics
-            # if self._params.statistics is not None:
-            #     self._log.debug('creating statistics...')
-            #     statistics = Statistics(self._params.statistics)
-            #     statistics.create(observation_log=observation_log_df)
 
     def _merge_observation_logs(self,
                                 policy_results: dict[str,

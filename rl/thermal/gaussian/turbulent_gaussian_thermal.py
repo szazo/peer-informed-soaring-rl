@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from typing import Tuple, Union, Optional
+from typing import Tuple, Union
 from .noise_field import NoiseField
 
 
@@ -34,11 +34,6 @@ class TurbulentGaussianThermal:
         self._log.debug(
             'x0=%s,y0=%s,max_r=%s,max_r_altitude=%s,max_r_sigma=%s,w_max=%s',
             x0, y0, max_r, max_r_altitude, max_r_sigma, w_max)
-
-        # x_range = np.arange(-1, 1 + res_x, res_x)
-        # y_range = np.arange(-1, 1 + res_y, res_y)
-        # z_range = np.arange(-1, 1 + res_z, res_z)
-        # print(x_range)
 
     def generate_field(
         self,
@@ -85,7 +80,6 @@ class TurbulentGaussianThermal:
         w = self.gaussian_lift(x, y, r, r, self.w_max, x0 + self.x0,
                                y0 + self.y0)
 
-        #spaces = (x_space, y_space, z_space)
         u = np.zeros(w.shape)
         v = np.zeros(w.shape)
 
@@ -107,25 +101,10 @@ class TurbulentGaussianThermal:
                                       y=y,
                                       z=z)
 
-            #print('time_s', time_s)
-            #print('x.shape', x.shape)
-            #        print('y.shape', y.shape)
-            #print('z.shape', z.shape)
-            #print('W shape', w.shape)
-            #print('noise_z.shape', noise_z.shape)
-
-            # print('w', np.min(w), np.max(w))
-            # print('noise', np.min(noise_z), np.max(noise_z))
-            #            w_with_noise = w * (1 + noise_z)
             w_with_noise = w + (noise_z)
-            # print('w_with_noise', np.min(w_with_noise), np.max(w_with_noise))
 
             u_with_noise = u + w * noise_x
             v_with_noise = v + w * noise_y
-            # print('noise_u', np.min(noise_x), np.max(noise_x))
-            # print('noise_v', np.min(noise_y), np.max(noise_y))
-            # print('u_with_noise', np.min(u_with_noise), np.max(u_with_noise))
-            # print('v_with_noise', np.min(v_with_noise), np.max(v_with_noise))
 
             u_with_noise = u_with_noise if u_with_noise.size > 1 else u_with_noise.item(
             )
@@ -136,17 +115,12 @@ class TurbulentGaussianThermal:
 
             return u_with_noise, v_with_noise, w_with_noise
         else:
-            # u = np.zeros(w.shape)
-            # v = np.zeros(w.shape)
-
             return u, v, w
 
     def _get_noise(self, noise_index: int, time_s: Union[float, np.ndarray],
                    x: Union[float, np.ndarray], y: Union[float, np.ndarray],
                    z: Union[float, np.ndarray]):
 
-        # print('XYZ', np.min(x), np.min(y), np.min(z))
-        # print('XYZ max', np.max(x), np.max(y), np.max(z))
         assert self._noise_field is not None, 'missing _noise_field'
 
         has_scalar_coord = np.isscalar(x) or np.isscalar(y) or np.isscalar(
@@ -160,7 +134,6 @@ class TurbulentGaussianThermal:
                 noise_index=noise_index, coordinates=coordinates)
         else:
             raise Exception('coding error: missing coordinates')
-            # self._noise_field.get_noise(noise_index=noise_index)
 
     def thermal_radius(self, altitude: float, max_r: float,
                        max_r_altitude: float, max_r_sigma: float):
@@ -223,33 +196,15 @@ class TurbulentGaussianThermal:
         a = 1 / (2 * r_x**2)
         c = 1 / (2 * r_y**2)
 
-        # print('a shape', a.shape)
-        # print('c shape', c.shape)
-
-        # print('x shape', x.shape)
-        # print('xshape', x.shape)
-        # print('x0', x0.shape)
-        # print('y0', y0.shape)
-        # print('yshape', y.shape)
         if not np.isscalar(x0) and x0.ndim < x.ndim:
             x0 = np.broadcast_to(
                 np.expand_dims(x0, axis=[d for d in range(1, x.ndim)]),
                 x.shape)
-#            broadcasted_x = np.broadcast_to(x0, x.shape)
-# print('bx', x0)
         if not np.isscalar(y0) and y0.ndim < y.ndim:
             y0 = np.broadcast_to(
                 np.expand_dims(y0[np.newaxis, :],
                                axis=[d for d in range(2, y.ndim)]), y.shape)
 
-
-#            broadcasted_x = np.broadcast_to(x0, x.shape)
-# print('by', y0)
-#print(X[:,...])
-#print('alma', np.expand_dims(y[np.newaxis, :], axis=[d for d in range(2, Y.ndim)]))
-#broadcasted = np.broadcast_to(np.expand_dims(y[np.newaxis, :], axis=[d for d in range(2, Y.ndim)]), Y.shape)
-
         f_xy = amplitude * np.exp(-(a * (x - x0)**2 + c * (y - y0)**2))
-        # print('f_xy shape', f_xy.shape)
 
         return f_xy

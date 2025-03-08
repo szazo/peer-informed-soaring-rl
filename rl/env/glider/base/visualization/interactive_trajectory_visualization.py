@@ -4,6 +4,7 @@ import numpy as np
 from env.glider.base import GliderTrajectory
 
 
+# NOTE: this will be removed
 class InteractiveTrajectoryVisualization:
 
     _plotter: pv.Plotter

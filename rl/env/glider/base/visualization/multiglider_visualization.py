@@ -16,8 +16,7 @@ from ..simulation_box_params import SimulationBoxParameters
 class RenderParameters:
     # currently omegaconf does not support literal:
     # https://github.com/omry/omegaconf/issues/422
-    # mode: Literal['human', 'rgb_array']
-    mode: str = 'rgb_array'
+    mode: str = 'rgb_array'  # human | rgb_array
     human_render_fps: int = 60
 
 
@@ -128,13 +127,8 @@ class Line2DPlotBase:
         for agent_id in current_trajectory_agent_ids:
             if agent_id not in data:
                 line = self._line_artists[agent_id]
-                # line.pop(0)
                 line.remove()
                 del self._line_artists[agent_id]
-
-        # ax.set(xlim3d=(-100, 100))
-
-        # ax.set_xlabel('x (m)', fontsize=)
 
 
 class VerticalVelocityPlot(Line2DPlotBase):
@@ -283,12 +277,6 @@ class TrajectoryPlot:
         ax.set_zlabel("z (m)")
 
         self._trajectory_ax = ax
-        # self._trajectory_line = ax.plot([], [], [])[0]
-        # self._trajectory_shadow_plot = ax.plot(
-        #     [], [], [], zdir="z", color="k", alpha=0.3
-        # )[0]
-
-        # print(self._trajectory_line)
 
     def render(self, trajectories: dict[AgentID, GliderTrajectory]):
 
@@ -307,30 +295,8 @@ class TrajectoryPlot:
                                                                       10:, :])
 
             trajectory_count += 1
-            # position_earth_xyz_m = trajectory.position_earth_xyz_m
-            # xy = position_earth_xyz_m[:, :2]
-            # z = position_earth_xyz_m[:, 2]
 
-            # print('xy,z', xy, z)
-
-
-#            xy = np.array([[100, 100], [-100, -100]])
-#            z = np.array([300, 350])
-
-#            xy = np.array([[-190.39551, -353.86365],
-#                           [-190.35434, -353.77615],
-#                           [-190.31406, -353.6883],
-#                           [-190.27397, -353.60034]])
-#            z = np.array([406.08224, 406.0702,  406.0581, 406.04602])
-
-# line.set_data(xy.T)
-# line.set_3d_properties(z)
-
-# self._trajectory_ax.set_xlabel(f"{len(z)}")
-
-# break
-
-# remove dead trajectories
+        # remove dead trajectories
         current_trajectory_agent_ids = list(self._trajectory_artists.keys())
         for agent_id in current_trajectory_agent_ids:
             if agent_id not in trajectories:
@@ -340,18 +306,9 @@ class TrajectoryPlot:
         if trajectory_count > 0:
             self._trajectory_ax.legend()
 
-        # ax.set_xlabel('x (m)', fontsize=)
-
 
 class PlotBase:
     pass
-
-    # _rc_style_sheet: dict
-
-    # def __init__(self, rc_style_sheet: dict | None = None):
-    #     pass
-
-    # pass
 
 
 class LayoutPlotBase:
@@ -407,9 +364,6 @@ class GridLayoutPlot(LayoutPlotBase):
         roll_ax = plt.subplot2grid(grid_shape, (2, 2), fig=figure)
         self._roll_plot.create(roll_ax)
 
-        # z_ax = plt.subplot2grid(grid_shape, (1,3), fig=figure)
-        # roll_ax = plt.subplot2grid(grid_shape, (2,3), fig=figure)
-
     def render(self, trajectories: dict[AgentID, GliderTrajectory],
                time_s: float):
         self._trajectory_plot.render(trajectories=trajectories)
@@ -462,14 +416,12 @@ class MultigliderVisualization:
             'axes.labelpad': 18,
             'xtick.labelsize': 16,
             'ytick.labelsize': 16,
-            # 'ztick.labelsize': 16
         }
 
         self._rc_style_sheet = rc_style_sheet if rc_style_sheet is not None else default_stylesheet
 
     def _create(self):
 
-        # with plt.style.context(self._rc_style_sheet):
         fig = self._create_figure()
 
         # attach the canvas to the figure
@@ -530,7 +482,6 @@ class MultigliderVisualization:
         if render_mode == 'human':
             pygame.display.update()
             self._clock.tick(self._render_params.human_render_fps)
-            #            self
         elif render_mode == 'rgb_array':
             return np.transpose(np.array(
                 pygame.surfarray.pixels3d(self._surface)),

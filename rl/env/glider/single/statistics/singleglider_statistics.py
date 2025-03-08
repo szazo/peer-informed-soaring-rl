@@ -43,11 +43,7 @@ class SingleGliderStatistics(ObservationStatisticsPlugin):
         mean_std_df['sigfig'] = mean_std_df.apply(
             lambda row: self._sigfig_mean_std(row['mean'], row['std']), axis=1)
 
-        print(mean_std_df)
-
         return mean_std_df
 
     def _sigfig_mean_std(self, mean: float, std: float):
-        #print('mean', mean, type(mean))
-        #print('std', std, type(std))
         return sigfig.round(mean, uncertainty=std, spacing=3, spacer=',')

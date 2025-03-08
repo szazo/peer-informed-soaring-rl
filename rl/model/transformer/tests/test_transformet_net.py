@@ -1,7 +1,8 @@
 from dataclasses import asdict
 import numpy as np
 import torch
-from model.transformer.transformer_net import TransformerNet, TransformerNetParameters
+from model.transformer.transformer_net import (TransformerNet,
+                                               TransformerNetParameters)
 from trainer.multi_agent.tests.create_sample_items import create_sample_items_with_shapes
 
 
@@ -65,13 +66,13 @@ def test_transformer_net_should_work_if_multiple_dimensions_before_sequence():
                                               encoder_layer_count=3,
                                               attention_head_num=4)
 
-    # # when execute separately
+    # when execute separately
     seq0_result, _ = transformer_net(np.expand_dims(items[0], axis=0))
     seq1_result, _ = transformer_net(np.expand_dims(items[1], axis=0))
     seq2_result, _ = transformer_net(np.expand_dims(items[2], axis=0))
     seq3_result, _ = transformer_net(np.expand_dims(items[3], axis=0))
 
-    # # when execute once withing a single batch
+    # when execute once withing a single batch
     batch_result, _ = transformer_net(input)
 
     assert batch_result.shape == (2, 2, 3)

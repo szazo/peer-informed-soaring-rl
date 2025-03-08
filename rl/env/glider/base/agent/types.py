@@ -1,4 +1,3 @@
-from typing import TypeVar, NewType
+from typing import NewType
 
-#AgentID = TypeVar("AgentID")
 AgentID = NewType('AgentID', str)

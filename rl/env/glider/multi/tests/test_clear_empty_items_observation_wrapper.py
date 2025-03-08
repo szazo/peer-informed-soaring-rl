@@ -3,7 +3,9 @@ from functools import reduce
 import numpy as np
 from pytest_mock import MockerFixture
 
-from ..multi_agent_observation_share_wrapper import ClearEmptyItemsObsParams, clear_empty_items_along_axis, clear_empty_items_obs_wrapper
+from ..multi_agent_observation_share_wrapper import (
+    ClearEmptyItemsObsParams, clear_empty_items_along_axis,
+    clear_empty_items_obs_wrapper)
 
 
 def test_clear_empty_items_obs_wrapper(mocker: MockerFixture):

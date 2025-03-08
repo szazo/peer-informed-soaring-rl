@@ -214,9 +214,4 @@ class SingleGliderEnvBase(gymnasium.Env[ObsType, float]):
         return self._agent.get_trajectory()
 
     def render(self):
-        # TODO: call visualization if has any
-        super().render()
-
-    def close(self):
-        # TODO: close visualization if has any
         pass

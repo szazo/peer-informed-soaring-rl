@@ -26,7 +26,6 @@ def violinplot(df: pd.DataFrame,
                cut: float = 0.5,
                show_title: bool = True):
 
-    # with plt.style.context(['science']):
     fig, ax = plt.figure(figsize=figsize), plt.gca()
     if hline is not None:
         ax.axhline(hline, color='gray', linestyle='--', linewidth=1)
@@ -43,7 +42,6 @@ def violinplot(df: pd.DataFrame,
         'hue_order': hue_order,
         'cut': cut,
         'bw': bw,
-        # 'bw': 'silverman',
         'gridsize': 1000,
         'linewidth': .5
     }
@@ -79,7 +77,6 @@ def violinplot(df: pd.DataFrame,
     for _, row in counts.iterrows():
         x_value = row[x_field]
         thermal_index = np.where(counts[x_field] == x_value)[0][0]
-        # y_pos = np.max(df.groupby(x_field).get_group(x_value)[y_field])
         y_pos = vp.get_ylim()[0] + (vp.get_ylim()[1] -
                                     vp.get_ylim()[0]) * 0.015
         n = row['ai']

@@ -1,7 +1,7 @@
-from env.glider.multi.multi_agent_observation_share_wrapper import Trajectory, extract_multi_agent_trajectories, write_trajectories_back
+from env.glider.multi.multi_agent_observation_share_wrapper import (
+    Trajectory, extract_multi_agent_trajectories, write_trajectories_back)
 import numpy as np
 
-from env.glider.multi.tests.test_sort_observations import create_sample_items
 from trainer.multi_agent.tests.create_sample_items import create_sample_item
 
 

@@ -2,8 +2,7 @@ from dataclasses import dataclass, field
 from ..base.wrappers.discrete_to_continuous_action_wrapper import DiscreteToContinuousDegreesParams
 from omegaconf import MISSING
 from .simulation_box_params import SimulationBoxParameters
-from .agent import (GliderInitialConditionsParameters, GliderRewardParameters,
-                    GliderCutoffParameters)
+from .agent import (GliderRewardParameters, GliderCutoffParameters)
 from .time_params import TimeParameters
 from .visualization import (
     RenderParameters,
@@ -15,14 +14,12 @@ from .agent import GliderAgentParameters
 
 @dataclass
 class EgocentricSpatialTransformationParameters:
-    # Literal['first','last']
-    relative_to: str = 'first'
+    relative_to: str = 'first'  # first | last
     reverse: bool = False
 
 
 @dataclass(kw_only=True)
 class GliderSimulationParameters:
-    # simple_aerodynamics_params: SimpleAerodynamicsParameters = field(default_factory=SimpleAerodynamicsParameters)
     simulation_box_params: SimulationBoxParameters = field(
         default_factory=SimulationBoxParameters)
     time_params: TimeParameters = field(default_factory=TimeParameters)

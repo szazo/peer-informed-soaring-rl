@@ -42,7 +42,7 @@ initialize_config_store()
 
 
 @hydra.main(version_base=None,
-            config_name='thermal_baseline_mcts_config',
+            config_name='todo:set_config',
             config_path='config')
 def exp_main(cfg: ExperimentConfig):
 

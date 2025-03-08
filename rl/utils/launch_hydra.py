@@ -9,7 +9,7 @@ def launch_hydra(config_path: str, config_name: str,
                  task_function: Callable[[Any], Any]):
 
     logging.getLogger().debug('Hello')
-    
+
     cmd = ['cmd', '-cn', 'config', '-cd', '.']
     argv_save = sys.argv
     sys.argv = cmd

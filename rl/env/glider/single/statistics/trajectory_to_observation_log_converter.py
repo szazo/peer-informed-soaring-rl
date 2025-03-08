@@ -35,7 +35,6 @@ class TrajectoryToObservationLogConverter:
 
         for key, value in self._params.filters.items():
             input_df = input_df.loc[input_df[key] == value]
-            # print('mask', mask)
 
         field_mappings = self._params.field_mappings
 
@@ -70,11 +69,8 @@ class TrajectoryToObservationLogConverter:
         # core position
         core_position_earth_m_xy: VectorNx2 = self._air_velocity_field.get_thermal_core(
             z_earth_m=position_earth_m_xyz[:, 2], t_s=air_velocity_time_s)
-        print('core_earth_m_xy', core_position_earth_m_xy.shape)
 
         # velocity vector length
-        # output_df['velocity_earth_m_per_s'] = np.linalg.norm()
-
         distance_from_core_m: VectorN = np.linalg.norm(
             position_earth_m_xyz[:, :2] - core_position_earth_m_xy, axis=1)
 
@@ -133,9 +129,4 @@ class TrajectoryToObservationLogConverter:
             horizontal_air_velocity_direction_deg
         })
 
-        #output_df['position_earth_m_x'] = input_df[self._x_field].astype('float32')
-        #        output_df['position_earth_m_y'] = input_df[self._y_field]
-        #        output_df['position_earth_m_z'] = input_df[self._z_field]
-        # print(output_df)
-        # print(output_df.dtypes)
         return output_df

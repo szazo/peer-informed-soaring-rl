@@ -1,10 +1,12 @@
+from dataclasses import asdict
 import numpy as np
 import torch
 from model.transformer.multi_level_transformer_net import TwoLevelTransformerNet
 from pytest_mock import MockerFixture
 
-from .test_multi_agent_transformer_net import _create_transformer_net, _create_transformer_net_params
-from model.multi_agent.test.test_multi_agent_transformer_net import TransformerNet, create_and_stack_sample_items
+from trainer.multi_agent.tests.create_sample_items import create_and_stack_sample_items
+from model.transformer.transformer_net import (TransformerNet,
+                                               TransformerNetParameters)
 
 
 def _create_obs():
@@ -38,7 +40,6 @@ def _create_obs():
 
     # convert nan to zeros
     obs = np.nan_to_num(obs, nan=0.)
-    # print('obs', obs, obs.shape)
 
     return obs
 
@@ -112,23 +113,12 @@ def test_should_call_different_transformer_for_the_first_item(
     expected[0, 2, :] = 0.
     expected[1, 1, :] = 0.
     actual = item_transformer.call_args[0][0]
-    print('expected_level2', expected)
-    print('actual', actual)
     assert isinstance(actual, torch.Tensor)
     assert expected.shape == actual.shape
     assert torch.allclose(expected, actual)
 
-    print('output', output)
 
-    # print('actual', actual)
-    # print('expected', expected)
-
-    # print(peer_sequence_transformer.call_args)
-
-    # print(result)
-
-
-def test_should_integrated(mocker: MockerFixture):
+def test_should_integrate(mocker: MockerFixture):
 
     torch.manual_seed(42)
 
@@ -157,92 +147,36 @@ def test_should_integrated(mocker: MockerFixture):
 
     output, _ = model(obs)
 
-    expected = torch.randn(2, 5)
-    loss = torch.nn.functional.binary_cross_entropy_with_logits(
-        output, expected)
-    print('loss', loss)
-
-    loss.backward()
-
-    grads1 = [param.grad.mean() for param in model.parameters()]
-    print('grads1', grads1)
-
-    print('output', output)
-
     # then
     assert output.shape == (2, 5)
 
-    print(output, output.shape)
 
-    print(obs, obs.shape)
-
-    zero_rows_mask = np.logical_not(np.all(obs == 0., axis=-1))
-
-    print('mask', zero_rows_mask)
-
-    # print('tmp', np.stack((obs[1,0], obs[1,2]), axis=0))
-
-    obs2 = np.stack((obs[0, 0:2], np.stack((obs[1, 0], obs[1, 2]), axis=0)),
-                    axis=0)
-    # obs2 = obs
-
-    # obs2 = obs[0]
-    print('obs2', obs2, obs2.shape)
-
-    output2, _ = model(obs2)
-
-    print('output2', output2)
-
-    loss = torch.nn.functional.binary_cross_entropy_with_logits(
-        output2, expected)
-    print('loss', loss)
-
-    model.zero_grad()
-    loss.backward()
-
-    grads2 = [param.grad.mean() for param in model.parameters()]
-
-    print('grads1', torch.tensor(grads1).mean(), torch.tensor(grads1).std())
-    print('grads1', torch.tensor(grads2).mean(), torch.tensor(grads2).std())
+def _create_transformer_net_params(input_dim: int,
+                                   encoder_layer_count=1,
+                                   attention_head_num=1,
+                                   attention_internal_dim=2,
+                                   output_dim=3,
+                                   pad_value=0.):
+    params = TransformerNetParameters(
+        input_dim=input_dim,
+        output_dim=output_dim,
+        attention_internal_dim=attention_internal_dim,
+        attention_head_num=attention_head_num,
+        ffnn_hidden_dim=4,
+        ffnn_dropout_rate=0.0,
+        max_sequence_length=100,
+        embedding_dim=4,
+        encoder_layer_count=encoder_layer_count,
+        enable_layer_normalization=False,
+        enable_causal_attention_mask=True,
+        is_reversed_sequence=True,
+        softmax_output=False,
+        pad_value=pad_value)
+    return params
 
 
-def test_sandbox():
+def _create_transformer_net(params: TransformerNetParameters):
 
-    w_orig = torch.randn(5, 3)
-    b_orig = torch.randn(3)
+    transformer_net = TransformerNet(**asdict(params))
 
-    y_orig = torch.randn(1, 3)
-
-    x = torch.ones(1, 5)  # input tensor
-    y = y_orig  # expected output
-
-    print('input', x)
-    print('y', y)
-
-    w = torch.tensor(w_orig, requires_grad=True)
-    b = torch.tensor(b_orig, requires_grad=True)
-    z = torch.matmul(x, w) + b
-    loss = torch.nn.functional.binary_cross_entropy_with_logits(z, y)
-
-    loss.backward()
-
-    print(w.grad)
-    print(b.grad)
-
-    # model 2
-    # x = torch.ones(2, 5) # input tensor
-    x = torch.cat((torch.zeros((1, 5)), torch.ones(1, 5)))
-    y = torch.cat((torch.zeros((1, 3)), y_orig))  # expected output
-
-    print('input', x)
-    print('y', y)
-
-    w = torch.tensor(w_orig, requires_grad=True)
-    b = torch.tensor(b_orig, requires_grad=True)
-    z = (torch.matmul(x, w) + b)
-    loss = torch.nn.functional.binary_cross_entropy_with_logits(z[1], y[1])
-    loss.backward()
-
-    print('---model2')
-    print(w.grad)
-    print(b.grad)
+    return transformer_net

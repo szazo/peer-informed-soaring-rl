@@ -143,16 +143,13 @@ class ScenePlayer:
         if self._current_state == 'finished':
             return
 
-        axes_opts = dict(
-            text_scale=0.3,
-            # axes_linewidth=1,
-            # grid_linewidth=0.5,
-            xtick_length=0.025,
-            xtick_thickness=0.0015,
-            ytick_thickness=0.0015,
-            xtitle='x (m)',
-            ytitle='y (m)',
-            ztitle='z (m)')
+        axes_opts = dict(text_scale=0.3,
+                         xtick_length=0.025,
+                         xtick_thickness=0.0015,
+                         ytick_thickness=0.0015,
+                         xtitle='x (m)',
+                         ytitle='y (m)',
+                         ztitle='z (m)')
 
         self._is_show_called = True
         self._plotter.show(viewup='z', axes=axes_opts)
@@ -195,7 +192,6 @@ class ScenePlayer:
 
     def _create_next_scene(self, start_episode: int, start_time_s: float):
 
-        # REVIEW: do while would be better
         self._destroy_current_scene()
         self._current_scene_index += 1
 

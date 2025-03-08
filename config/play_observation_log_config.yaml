@@ -1,7 +1,7 @@
 defaults:
   - experiment_config
   - custom_job@job: observation_log_player
-  - /env/glider/air_velocity_field@job.scene.air_velocity_field: multi_agent_thermal_wind_turbulence
+  - /env/glider/air_velocity_field@job.scene.air_velocity_field: multi_agent_thermal_wind
   - override hydra/job_logging: custom_logging
   - _self_
 

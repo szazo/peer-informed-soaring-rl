@@ -7,7 +7,9 @@ from dataclasses import dataclass, field
 import hydra
 import torch
 import tianshou
-from ..experiment_logger import ExperimentLoggerConfigBase, ExperimentLoggerInterface, create_experiment_logger
+from ..experiment_logger import (ExperimentLoggerConfigBase,
+                                 ExperimentLoggerInterface,
+                                 create_experiment_logger)
 from ..tianshou_evaluator import EvaluatorConfigBase, TianshouEvaluatorBase
 from ..statistics import StatisticsConfigBase, run_statistics
 from ..common import TianshouModelConfigBase

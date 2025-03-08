@@ -1,9 +1,7 @@
-from typing import Callable, Hashable, Tuple, Any
+from typing import Callable, Tuple, Any
 from dataclasses import asdict
 import numpy as np
 import tianshou
-from tianshou.data import (
-    SequenceSummaryStats, )
 
 from tianshou.utils.logger.base import VALID_LOG_VALS_TYPE, VALID_LOG_VALS
 from trainer.experiment_logger import ExperimentLoggerInterface

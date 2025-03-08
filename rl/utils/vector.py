@@ -1,4 +1,4 @@
-from typing import Literal, Any, Annotated
+from typing import Literal, Annotated
 import numpy as np
 import numpy.typing as npt
 

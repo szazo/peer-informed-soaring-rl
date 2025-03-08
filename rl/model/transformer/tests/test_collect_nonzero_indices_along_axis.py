@@ -19,7 +19,6 @@ def test_fill_zero_rows_should_fill():
     # when
     mask = create_zero_rows_mask(input, zero_value=zero_value, dim=dim)
     input[mask] = fill
-    # fill_zero_rows(input, zero_value=zero_value, dim=dim, fill_value=fill)
 
     # then
     expected = torch.tensor([[fill, fill, fill], [v, 1., v], [1., 2., 3.],

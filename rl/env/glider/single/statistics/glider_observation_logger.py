@@ -14,7 +14,6 @@ class GliderObservationLogger(ObservationLogger):
                                       output_df: pd.DataFrame):
 
         info = buffer.info
-        # reward = buffer.rew
 
         output_df["time_s"] = info["t_s"]
 
@@ -99,7 +98,7 @@ class GliderObservationLogger(ObservationLogger):
         # air velocity field
         air_velocity_field = initial_conditions["air_velocity_field"]
 
-        # REVIEW: implement air velocity field specific transformer
+        # REVIEW: implement air velocity field specific plugin
         if air_velocity_field is not None:
             if "max_r_m" in air_velocity_field:
                 # only if we have data, realistic field has no initial condition log yet

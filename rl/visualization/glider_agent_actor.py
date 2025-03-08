@@ -208,7 +208,6 @@ class GliderAgentActor:
 
     def _create_flagpost(self, plane: vedo.Mesh):
 
-        # text_size = 0.8
         text_size = 0.6
 
         flagpost = plane.flagpost(

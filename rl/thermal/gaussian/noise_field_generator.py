@@ -55,8 +55,6 @@ class NoiseFieldGenerator():
             self._noise_gaussian_filter_sigma_normal_mean,
             self._noise_gaussian_filter_sigma_normal_sigma)
 
-        #print('GAUSSIAN_FILTER_SIGMA', gaussian_filter_sigma)
-
         noise_field = NoiseField(
             noise_count=self._noise_count,
             dimension_resolution=self._noise_field_grid_resolution,
@@ -76,10 +74,6 @@ class NoiseFieldGenerator():
             gaussian_filter_sigma=gaussian_filter_sigma,
             grid_range=(np.array(self._noise_field_grid_range_high) -
                         np.array(self._noise_field_grid_range_low)),
-            grid_resolution=np.array(self._noise_field_grid_resolution)
-            # grid_spacingtmp=(np.array(self._noise_field_grid_resolution, dtype=np.float32)[..., -3:]),
-            # grid_spacingtmp2=(np.array(self._noise_field_grid_resolution, dtype=np.float32) - 1.),
-            # grd=(np.array(self._noise_field_grid_range_high) - np.array(self._noise_field_grid_range_low)) / (np.array(self._noise_field_grid_resolution, dtype=np.float32) - 1.)
-        )
+            grid_resolution=np.array(self._noise_field_grid_resolution))
 
         return noise_field, initial_conditions

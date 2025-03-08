@@ -132,16 +132,6 @@ def glider_dict_to_array_obs_wrapper(
 
             return new_obs_space
 
-        # def modify_action_space(
-        #     self, act_space: gymnasium.spaces.Space
-        # ) -> gymnasium.spaces.Space:
-        #     print("modify_action_space")
-        #     return act_space
-
-        # def modify_action(self, act: ActionType) -> ActionType:
-        #     print("modify_action", act)
-        #     return act
-
     wrapped = shared_wrapper(env, GliderDictToArrayModifier)
     assert isinstance(wrapped, gymnasium.Env) or isinstance(
         wrapped, pettingzoo.ParallelEnv)

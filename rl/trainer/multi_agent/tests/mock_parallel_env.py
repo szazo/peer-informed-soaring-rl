@@ -40,14 +40,9 @@ class MockParallelEnv(pettingzoo.ParallelEnv[str, VectorNx3, VectorN]):
         options: dict | None = None,
     ) -> tuple[dict[str, VectorNx3], dict[str, dict]]:
 
-        print('reset', self._env_name)
-
         obs, info = self._create_reset_result()
         self.agents = list(obs.keys())
         self._current_step = 0
-
-        print('reset result', self._env_name, obs, info, 'agents:',
-              self.agents)
 
         return obs, info
 
@@ -60,8 +55,6 @@ class MockParallelEnv(pettingzoo.ParallelEnv[str, VectorNx3, VectorN]):
             dict[str, bool],
             dict[str, dict],
     ]:
-
-        print('step', self._env_name, actions)
 
         action_agent_ids = list(actions.keys())
         action_agent_ids.sort()
@@ -76,9 +69,6 @@ class MockParallelEnv(pettingzoo.ParallelEnv[str, VectorNx3, VectorN]):
 
         self._current_step += 1
         self.agents = agent_ids
-
-        print('step result', self._env_name, obs, reward, terminated,
-              truncated, info, self.agents)
 
         return obs, reward, terminated, truncated, info
 

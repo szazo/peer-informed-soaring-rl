@@ -78,18 +78,14 @@ class MockPolicy(BasePolicy):
         **kwargs: Any,
     ) -> ActBatchProtocol:
 
-        print('MockPolicy forward', batch)
-
         obs = batch.obs
         info = batch.info
 
         assert isinstance(info, Batch)
 
         batch_size = obs.shape[0]
-        print('batch size', obs.shape)
 
         actions = np.zeros((batch_size, self._action_space.shape[0]))
-        print('action shape', actions.shape)
         for i in range(batch_size):
             agent_id: int = info.agent_idx[i]
             step: int = info.step[i]
@@ -97,13 +93,9 @@ class MockPolicy(BasePolicy):
 
             action = create_action(step=step, env_id=env, agent_id=agent_id)
             actions[i] = action
-        #actions = np.expand_dims(actions, axis=0).T
-        print('Policy Action', actions)
         actions = np.float32(actions)
 
         result = Batch(act=actions)
-
-        print('Policy result', actions, actions.shape, actions.dtype)
 
         assert isinstance(batch.obs, np.ndarray)
         assert isinstance(actions, np.ndarray)
@@ -143,10 +135,6 @@ class MockPolicy(BasePolicy):
             steps = list(generator)
             env_agent_steps.append(steps)
 
-        # print('env_agent_steps 1', env_agent_steps[0][0], env_agent_steps[1][0])
-        # print('env_agent_steps 2', env_agent_steps[0][1], env_agent_steps[1][1])
-        # raise False
-
         # create the expected forward calls
         forward_inputs_outputs: list[tuple[np.ndarray, np.ndarray]] = []
 
@@ -164,10 +152,6 @@ class MockPolicy(BasePolicy):
 
                 agent_steps = env_agent_steps[env_id]
 
-                # agent_step_index = current_step
-                # if with_reset:
-                #     agent_step_index = agent_step_index % len(agent_steps)
-
                 agent_step = None
                 agent_step_index = env_step_indices[env_id]
                 if agent_step_index >= 0 and agent_step_index < len(
@@ -176,10 +160,6 @@ class MockPolicy(BasePolicy):
                 if agent_step is not None:
 
                     found_env = True
-
-                    # print('CURRENT', obs, obs.shape)
-                    # print('CURRENT NEXT', agent_step[0].obs, np.expand_dims(agent_step[0].obs, axis=0))
-                    # print('ALMA', np.vstack((obs, np.expand_dims(agent_step[0].obs, axis=0))))
 
                     obs = np.vstack(
                         (obs, np.expand_dims(agent_step[0].obs, axis=0)))
@@ -192,10 +172,6 @@ class MockPolicy(BasePolicy):
                 # increase the step
                 env_step_indices[env_id] += 1
 
-                # obs_next = np.vstack((obs_next, np.expand_dims(agent_step[2].obs, axis=0)))
-                # act = np.stack((act, agent_step[1].action))
-                # obs_next = np.stack((act, agent_step[2].obs))
-
             if found_env:
                 forward_inputs_outputs.append((obs, act))
             else:
@@ -203,17 +179,7 @@ class MockPolicy(BasePolicy):
                 if with_reset:
                     env_step_indices = [0] * env_count
 
-            print('CURRENT OBS, ACT< OBS_NMEXT', obs, act)
-
-            # if the step is not empt
-            # iterate every agent
-            # for agent_id in
-
-            #  for each
-
-        print('EXPECTED', forward_inputs_outputs)
         return forward_inputs_outputs
-        # env_agent_steps: list[list[list[None | tuple[Obs, ActionStep, Obs]]]] = []
 
     def process_fn(
         self,
@@ -221,13 +187,6 @@ class MockPolicy(BasePolicy):
         buffer: ReplayBuffer,
         indices: np.ndarray,
     ) -> RolloutBatchProtocol:
-
-        print('MockPolicy process_fn', self._agent_id)
-        print('indices', indices)
-        print('obs', self._agent_id, batch.obs)
-        print('obs_next', self._agent_id, batch.obs_next)
-        print('rew', self._agent_id, batch.rew)
-        print('buffer.rew', self._agent_id, buffer.rew)
 
         # split the batch by env indices
         info = batch.info
@@ -246,14 +205,10 @@ class MockPolicy(BasePolicy):
             gae_lambda=1.0,
         )
 
-        # print('info', info)
-        # print('env_idx', env_idxs)
-
         # assert the input batch for each environment
         for env_idx in np.unique(env_idxs):
 
             mask = env_idxs == env_idx
-            # print('env', env_idx, mask)
 
             env_batch = batch[mask]
 
@@ -263,22 +218,15 @@ class MockPolicy(BasePolicy):
             length = len(env_batch.info['step'])
 
             # create expected batch
+            # REVIEW: refactor to separate assertion method, because
+            # the length should be allowed to set from the outside
             expected_batch = create_expected_agent_trajectory_rollout_batch(
                 env_id=env_idx,
                 agent_id=agent_idx,
                 step_offset=step_offset,
                 length=length)
 
-            # print('ENV_BATCH', env_batch.obs)
-            # print('EXPECTED_BATCH', expected_batch.obs)
-
             # check whether correct batch arrived
-            print('STEP OFFSET', step_offset, length, env_batch.info['step'])
-            print('PROCESS OBS', env_batch.obs)
-            print('PROCESS ACT', env_batch.act)
-            print('PROCESS REW', env_batch.rew)
-            print('EXPECTED OBS', expected_batch.rew)
-            print('INDICES', indices)
             assert np.allclose(expected_batch.obs, env_batch.obs)
             assert np.allclose(expected_batch.act, env_batch.act)
             assert np.allclose(expected_batch.obs_next, env_batch.obs_next)
@@ -288,7 +236,6 @@ class MockPolicy(BasePolicy):
             assert np.allclose(expected_batch.done, env_batch.done)
 
             # assert that env returns does not leak outside of the env
-            # print('COMPUTER RETURNS', env_idx)
             env_returns, _ = self.compute_episodic_return(
                 env_batch,
                 buffer,
@@ -300,16 +247,10 @@ class MockPolicy(BasePolicy):
 
             env_batch.returns = env_returns
             assert np.allclose(batch_returns[mask], env_returns)
-            # print('env batch', env_batch)
-            # print('ret', )
 
-        # print('MockPolicy unnormalized returns', unnormalized_returns)
         # return the returns for the agent for each env
         batch.returns = batch_returns
         batch.act = to_torch(batch.act)
-
-        # print('batch returns', self._agent_id, batch_returns )
-        # print('BATCH', batch)
 
         self._last_process_fn_result = batch
 
@@ -318,14 +259,10 @@ class MockPolicy(BasePolicy):
     def learn(self, batch: RolloutBatchProtocol, *args: Any,
               **kwargs: Any) -> MockTrainingStats:
 
-        print('MOCKPolicy learn', batch)
-
         # check whether the result from process_fn arrived here
         assert self._last_process_fn_result == batch
 
-        print('CALLING SELF')
         dist = self(batch)
-        print('CALLING SELF RES', dist)
 
         self(batch)
 

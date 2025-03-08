@@ -9,9 +9,9 @@ from utils import Vector2
 
 @dataclass
 class SystemParams:
-    omega_natural_frequency: float  # natural frequency
-    zeta_damping_ratio: float  # damping ratio
-    k_process_gain: float  # K process gain
+    omega_natural_frequency: float
+    zeta_damping_ratio: float
+    k_process_gain: float
 
 
 class SecondOrderSystem:
@@ -28,7 +28,6 @@ class SecondOrderSystem:
         zeta = self._params.zeta_damping_ratio
         k = self._params.k_process_gain
 
-        # theta dt will be the theta_dot
         dtheta_dt = theta_dot
         dtheta_dot_dt = -omega**2 * theta - 2 * zeta * omega * theta_dot + omega**2 * k * u_input
 

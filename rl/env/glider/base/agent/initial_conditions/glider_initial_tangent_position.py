@@ -84,7 +84,8 @@ class GliderInitialTangentPosition:
             if self._current_dynamic_distance_from_tangent_position_m < self._params.starting_distance_from_tangent_position_m_normal_mean:
                 self._current_dynamic_distance_from_tangent_position_m += self._params.increase_distance_with_every_generation_by
             start_distance_from_tangent_m = self._current_dynamic_distance_from_tangent_position_m
-            print('Current starting distance: ', start_distance_from_tangent_m)
+            self._log.debug('current starting distance=%s',
+                            start_distance_from_tangent_m)
         else:
             start_distance_from_tangent_m = self._np_random.normal(
                 self._params.

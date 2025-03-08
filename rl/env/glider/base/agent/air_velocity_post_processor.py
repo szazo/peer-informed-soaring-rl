@@ -1,7 +1,6 @@
 from typing import Any, cast
 import logging
 from dataclasses import dataclass
-from gymnasium.utils.seeding import np_random
 import numpy as np
 
 from utils import Vector3, VectorN, RollingWindowFilter

@@ -3,14 +3,11 @@ from dataclasses import dataclass
 from numbers import Number
 import numpy as np
 
-from google.protobuf import descriptor_pool
 from .api import ExperimentLoggerInterface, ExperimentLoggerParametersBase
 from torch.utils.tensorboard.writer import SummaryWriter
 from .dictionary_to_yaml import dictionary_to_yaml
 from .file_cache import FileCache
-# from moviepy.editor import VideoFileClip
 from torchvision.transforms import functional
-# import torchvision
 import torch
 import imageio
 

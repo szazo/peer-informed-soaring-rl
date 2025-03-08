@@ -128,24 +128,19 @@ class LinearRegressionPlot:
                         ax=ax,
                         hue=hue,
                         style=style)
-        # marker='',
-        # facecolor='none')
-        # alpha=0.5)
 
         x, y = self._resolve_xy()
 
         if x_err is not None or y_err is not None:
-            ax.errorbar(
-                x=x,
-                y=y,
-                xerr=x_err,
-                yerr=y_err,
-                fmt='none',
-                ecolor='lightgray',
-                zorder=0,
-                elinewidth=0.5,
-                # capsize=2,
-                capthick=0.5)
+            ax.errorbar(x=x,
+                        y=y,
+                        xerr=x_err,
+                        yerr=y_err,
+                        fmt='none',
+                        ecolor='lightgray',
+                        zorder=0,
+                        elinewidth=0.5,
+                        capthick=0.5)
 
         if show_title:
             ax.set_title(title)

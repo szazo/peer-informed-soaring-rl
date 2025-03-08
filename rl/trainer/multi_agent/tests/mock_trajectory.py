@@ -65,7 +65,6 @@ def create_action(step: int, env_id: int, agent_id: int) -> VectorN:
 
     offset = calculate_offset(step=step, env_id=env_id, agent_id=agent_id)
     action = np.arange(offset, offset + ACT_SHAPE[0], dtype=np.float_)
-    # np.float32(1. * offset)
     return action
 
 

@@ -1,6 +1,5 @@
 import torch
 import logging
-from torch.types import Device
 
 
 def find_suitable_torch_device(device_str: str) -> torch.device:

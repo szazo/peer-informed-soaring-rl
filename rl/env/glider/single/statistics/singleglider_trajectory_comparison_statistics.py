@@ -1,4 +1,3 @@
-import os
 import logging
 from dataclasses import dataclass
 import pandas as pd
@@ -52,8 +51,6 @@ class SingleGliderTrajectoryComparisonStatistics(ObservationStatisticsPlugin):
             k: v
             for k, v in additional_columns.items() if k != '_index_'
         }
-
-        print('index', index_value, 'additional_columns', additional_columns)
 
         # observation statistics
         self._log.debug(
@@ -138,6 +135,4 @@ class SingleGliderTrajectoryComparisonStatistics(ObservationStatisticsPlugin):
         return out_df
 
     def _sigfig_mean_std(self, mean: float, std: float):
-        #print('mean', mean, type(mean))
-        #print('std', std, type(std))
         return sigfig.round(mean, uncertainty=std, spacing=3, spacer=',')

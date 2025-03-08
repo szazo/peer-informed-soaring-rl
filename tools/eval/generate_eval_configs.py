@@ -5,9 +5,8 @@ from ruamel.yaml import YAML
 
 from utils.random_state import serialize_random_state
 
-DEFAULT_BASE_DIR = os.path.join(
-    os.path.dirname(__file__),
-    '../../config/eval/gaussian')
+DEFAULT_BASE_DIR = os.path.join(os.path.dirname(__file__),
+                                '../../config/eval/gaussian')
 
 AIR_VELOCITY_FIELD_OUT_DIR = os.path.join(DEFAULT_BASE_DIR,
                                           'air_velocity_fields')
@@ -32,7 +31,7 @@ def create_air_velocity_field_config(seed: int, index: int, out_filepath: str):
 
     defaults = [{
         'override /env/glider/air_velocity_field@_here_':
-        'multi_agent_thermal_wind_turbulence',
+        'multi_agent_thermal_wind',
     }, '_self_']
 
     air_velocity_field = {

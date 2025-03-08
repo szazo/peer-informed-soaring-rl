@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from hydra.core.config_store import ConfigStore
 
 from ..api import StatisticsConfigBase
-from .observation_statistics import ObservationStatistics, ObservationStatisticsParameters
+from .observation_statistics import ObservationStatisticsParameters
 
 
 @dataclass

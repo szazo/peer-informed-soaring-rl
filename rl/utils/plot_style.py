@@ -14,9 +14,5 @@ def plot_style(additional_rc_params: dict = {}):
     }
 
     with plt.style.context(['science', additional_rc_params]):
-        # plt.rcParams['errorbar.capsize'] = 5
-
-        # for key, value in plt.rcParams.items():
-        #     print(f'{key}: {value}')
 
         yield

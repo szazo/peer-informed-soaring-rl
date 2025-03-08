@@ -1,5 +1,4 @@
 from typing import Any
-from dataclasses import dataclass
 import numpy as np
 import gymnasium
 import pettingzoo

@@ -10,7 +10,8 @@ def test_create_should_not_smoke():
                   ffnn_dropout_rate=0.1,
                   attention_head_num=3,
                   layer_count=3,
-                  enable_layer_normalization=False)
+                  enable_layer_normalization=False,
+                  activation='relu')
 
     # then
     assert enc is not None

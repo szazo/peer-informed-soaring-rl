@@ -5,7 +5,7 @@ import gymnasium
 from torch.types import Device
 from model.actor_critic.discrete_actor_critic import DiscreteActorCriticNetworkWithCommonEncoderNetworkParameters
 from model.transformer.transformer_net import TransformerNetParameters
-from model.transformer.multi_level_transformer_net import MultiLevelTransformerNet, TwoLevelTransformerNet
+from model.transformer.multi_level_transformer_net import TwoLevelTransformerNet
 from trainer.common import TianshouModelConfigBase
 from hydra.core.config_store import ConfigStore
 
@@ -93,9 +93,6 @@ def register_ppo_transformer_model_config_groups(base_group: str,
     config_store.store(group=f'{base_group}',
                        name='two_level_transformer',
                        node=TwoLevelTransformerNetConfig)
-    config_store.store(group=f'{base_group}',
-                       name='multi_level_transformer',
-                       node=MultiLevelTransformerNetConfig)
 
 
 @dataclass
@@ -121,21 +118,6 @@ class ModuleConfigBase:
 class TransformerNetConfig(ModuleConfigBase, TransformerNetParameters):
     _target_: str = 'model.transformer.transformer_net.TransformerNet'
     _partial_: bool = True
-
-
-@dataclass(kw_only=True)
-class MultiLevelTransformerNetConfig(ModuleConfigBase):
-    transformers: list[TransformerNetConfig]
-
-    _target_: str = 'model.ppo_custom_transformer_model_config.create_multi_level_transformer_net'
-    _partial_: bool = True
-
-
-def create_multi_level_transformer_net(transformers: list[functools.partial],
-                                       device: torch.device):
-
-    instances = [transformer(device=device) for transformer in transformers]
-    return MultiLevelTransformerNet(instances, device)
 
 
 @dataclass(kw_only=True)

@@ -7,7 +7,6 @@ from .multihead_attention2 import MultiheadAttention2
 from .initialization import initialize_t_fixup_weights
 
 
-# Swish Function
 class Swish(nn.Module):
 
     def forward(self, x):

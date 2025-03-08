@@ -47,10 +47,7 @@ class VerticalPlotParameters:
     vertical_minor_locator_gap_count: int | None = 2
     horizontal_major_locator_gap_m: float = 100
     horizontal_minor_locator_gap_count: int | None = 2
-    # hydra does not support Literal enums now
-    #projection: Literal['XZ', 'YZ'] = 'XZ'
     projection: str = 'XZ'
-    #projection_type: Literal['max', 'follow_core'] = 'max'
     projection_type: str = 'follow_core'
 
 
@@ -83,7 +80,7 @@ class ColorStyleParams:
         default_factory=lambda: np.linspace(cmap_min, cmap_max, 60))
     colormap_vmin: float | None = cmap_min
     colormap_vmax: float | None = cmap_max
-    colormap = thermal_cmap  #cmocean.cm.thermal # mpl.cm.coolwarm
+    colormap = thermal_cmap
 
 
 @dataclass
@@ -450,11 +447,6 @@ class ThermalCrossSectionPlot:
         ax.set_ylabel('y (m)')
         ax.tick_params(pad=1)
 
-        # ax1.quiver(X_horizontal, Y_horizontal, u_horizontal, v_horizontal)
-        # ax.set_aspect('equal', adjustable='box')
-        # ax.relim()
-        # ax.autoscale_view()
-
         return cp
 
     def create_colorbar(self,
@@ -474,12 +466,11 @@ class ThermalCrossSectionPlot:
                                 ticks=MultipleLocator(ticks),
                                 ax=ax,
                                 cax=cax)
-        colorbar.set_label(
-            'Vertical speed (m/s)')  # fontsize=self._style.axis_fontsize)
+        colorbar.set_label('Vertical speed (m/s)')
 
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.colorbar.html
         self._svg_compatible_contour(colorbar.solids)
 
     def _svg_compatible_contour(self, p: ContourSet):
-        # # https://github.com/matplotlib/matplotlib/issues/4419
+        # https://github.com/matplotlib/matplotlib/issues/4419
         p.set_edgecolor('face')

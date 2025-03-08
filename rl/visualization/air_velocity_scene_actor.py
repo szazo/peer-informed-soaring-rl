@@ -4,7 +4,6 @@ from matplotlib.colors import LinearSegmentedColormap, ListedColormap
 from dataclasses import dataclass, asdict
 import numpy as np
 import vedo
-from vedo.colors import colors
 import matplotlib as mpl
 from omegaconf import MISSING
 import hydra
@@ -22,7 +21,6 @@ class SceneParams:
     simulation_box: SimulationBoxParameters
     air_velocity_grid_spacing_m: float
     minimum_vertical_velocity_m_per_s: float | None
-    # max_agent_color_num: int
     colormap_name: str
     agent_color_index_map: dict[str, int]
 
@@ -128,9 +126,6 @@ class AirVelocitySceneActor:
             current_time_s = 0.
         else:
             current_time_s = self._last_time_s + dt_s
-
-        # assert self._timer_text is not None
-        # self._timer_text.text(f'time: {current_time_s:.2f}s')
 
         self._log.debug('step; current_time_s=%f;dt_s=%f', current_time_s,
                         dt_s)
@@ -249,7 +244,6 @@ class AirVelocitySceneActor:
             np.linspace(box.limit_earth_xyz_low_m[2],
                         box.limit_earth_xyz_high_m[2],
                         num=resolution[2]))
-        # coords = [item.ravel() for item in (X,Y,Z)]
         x = X.ravel()
         y = Y.ravel()
         z = Z.ravel()
@@ -299,9 +293,6 @@ class AirVelocitySceneActor:
         nodes = [0.0, zero_pos, zero_pos + (1 - zero_pos) / 3, 0.8, 1.0]
         cmap = list(zip(nodes, colors))
 
-        #return cmap
-        #return vedo.build_lut(cmap, vmin=0, vmax=1, interpolate=True)
-
         return LinearSegmentedColormap.from_list('thermal_cmap', cmap)
 
     def _calculate_resolution(self, box_size: Vector3,
@@ -325,7 +316,5 @@ class AirVelocitySceneActor:
                         air_velocity_field)
 
         air_velocity_field.reset()
-
-        return air_velocity_field
 
         return air_velocity_field

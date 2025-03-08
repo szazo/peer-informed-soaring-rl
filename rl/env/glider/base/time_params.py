@@ -5,7 +5,6 @@ import numpy as np
 @dataclass
 class TimeParameters:
 
-    # duration_s: float
     # simulation step time
     dt_s: float = 1.0
     # determines time interval between decisions

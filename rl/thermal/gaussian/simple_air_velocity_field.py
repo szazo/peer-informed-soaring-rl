@@ -69,20 +69,18 @@ class SimpleAirVelocityField(AirVelocityFieldInterface):
     _is_turbulence_noise_time_dependent: bool | None
     _is_horizontal_wind_noise_time_dependent: bool | None
 
-    def __init__(
-            self,
-            thermal_params: GaussianThermalParameters,
-            horizontal_wind_params: HorizontalWindParameters | None,
-            horizontal_wind_noise_generator: NoiseFieldGenerator | None,
-            is_horizontal_wind_noise_time_dependent: bool | None,
-            turbulence_noise_generator: NoiseFieldGenerator | None,
-            is_turbulence_noise_time_dependent: bool | None,
-            turbulence_episode_regenerate_probability: float,
-            max_altitude_m: float,
-            # horizontal_wind_profile_vertical_resolution: int = 10,
-            seed: int | None = None,
-            random_state: RandomGeneratorState | None = None,
-            name: str | None = None):
+    def __init__(self,
+                 thermal_params: GaussianThermalParameters,
+                 horizontal_wind_params: HorizontalWindParameters | None,
+                 horizontal_wind_noise_generator: NoiseFieldGenerator | None,
+                 is_horizontal_wind_noise_time_dependent: bool | None,
+                 turbulence_noise_generator: NoiseFieldGenerator | None,
+                 is_turbulence_noise_time_dependent: bool | None,
+                 turbulence_episode_regenerate_probability: float,
+                 max_altitude_m: float,
+                 seed: int | None = None,
+                 random_state: RandomGeneratorState | None = None,
+                 name: str | None = None):
 
         self._log = logging.getLogger(__class__.__name__)
 
@@ -232,17 +230,6 @@ class SimpleAirVelocityField(AirVelocityFieldInterface):
             noise_field=noise_field,
             is_time_dependent_noise=self._is_turbulence_noise_time_dependent)
 
-        # else:
-        #     self._thermal = GaussianThermal(
-        #         x0_m,
-        #         y0_m,
-        #         max_r_m,
-        #         max_r_altitude_m,
-        #         max_r_m_sigma,
-        #         w_max_m_per_s,
-        #         horizontal_circulation_w_factor,
-        #     )
-
         initial_conditions = dict(
             max_r_m=max_r_m,
             max_r_altitude_m=max_r_altitude_m,
@@ -269,38 +256,6 @@ class SimpleAirVelocityField(AirVelocityFieldInterface):
 
         return initial_conditions
 
-        # self._visualizer = SimpleAirVelocityFieldVisualization(self._thermal)
-
-    # @property
-    # def visualizer(self):
-    #     return self._visualizer
-
-    # def _create_thermal(self):
-
-    #     # center of the thermal
-    #     x0_m = 0
-    #     y0_m = 0
-
-    #     # parameters of the thermal
-    #     max_r_m = 120
-    #     max_r_altitude_m = 1200
-    #     max_r_sigma = 900
-
-    #     w_max_ms = 3.0
-    #     horizontal_circulation_w_factor = 0.1
-
-    #     thermal = GaussianThermal(
-    #         x0_m,
-    #         y0_m,
-    #         max_r_m,
-    #         max_r_altitude_m,
-    #         max_r_sigma,
-    #         w_max_ms,
-    #         horizontal_circulation_w_factor,
-    #     )
-
-    #     return thermal
-
     @property
     def thermal(self):
         return self._thermal
@@ -314,74 +269,28 @@ class SimpleAirVelocityField(AirVelocityFieldInterface):
         self._log.debug('get_velocity; x=%s,y=%s,z=%s,t_s=%s', x_earth_m,
                         y_earth_m, z_earth_m, t_s)
 
-        #         # TODO: use time
-        #         t_s = 0.
-
-        # #        print('Z', z_earth_m)
-        #         # generate core horizontal displacement profile
-        #         z_tmp = np.linspace(0., self._max_altitude_m, 10)
-
-        #         horizontal_displacement_m = self._horizontal_wind.integrate_horizontal_displacement(
-        #             time_s=t_s, altitude_m=z_tmp, vertical_velocity_m_per_s=self._w_max_m_per_s)
-
-        #print('DISPLACEMENT', horizontal_displacement_m)
-        #       print('z_tmp', z_tmp.shape)
-        #       print('horizontal_displacement_m', horizontal_displacement_m.shape)
-        # print('z_earth_m', z_earth_m)
-        # displacements_xy_m = scipy.interpolate.interpn(
-        #     points = [z_tmp], values=horizontal_displacement_m, xi=np.array([z_earth_m]) if np.isscalar(z_earth_m) else z_earth_m[..., np.newaxis]
-        # )
-        #print('DISPLACEMENT', displacements_xy_m.shape, displacements_xy_m[0])
-
         thermal_core = self.get_thermal_core(z_earth_m=z_earth_m, t_s=t_s)
 
         x0 = thermal_core[..., 0]
         y0 = thermal_core[..., 1]
 
-        # print('CORE', x0, y0)
-        #print('x0.shape' ,x0.shape)
-        #print('x0' ,x0[0])
-        #print('x0' ,x0[50])
-
-        # print('z_earth_m', z_earth_m)
         u, v, w = self._thermal.get_velocity(time_s=t_s,
                                              x=x_earth_m,
                                              y=y_earth_m,
                                              z=z_earth_m,
                                              x0=x0,
                                              y0=y0)
-
-        # print('U before wind', u.shape if not np.isscalar(u) else u, np.max(u))
-        # print('V before wind', v.shape if not np.isscalar(v) else v, np.max(v))
-        # print('Z', z_earth_m.shape if not np.isscalar(z_earth_m) else z_earth_m, np.min(z_earth_m), np.max(z_earth_m))
-        # TODO: zero now
         wind_time_s = 0.
         wind_velocity_vector = self._horizontal_wind.get_wind(
             time_s=wind_time_s, altitude_m=z_earth_m)
-        # print('WIND', wind_velocity_vector.shape)
 
         u_wind = wind_velocity_vector[..., 0]
         v_wind = wind_velocity_vector[..., 1]
 
-        # print('U wind', u_wind.shape)
-        # print('V wind', v_wind.shape)
-        # print('U wind', u_wind)
-        # print('V wind', v_wind)
-
         # add horizontal wind
-
-        # print('U before wind', u.shape if not np.isscalar(u) else u, np.max(u))
-        # print('V before wind', v.shape if not np.isscalar(v) else v, np.max(v))
         u += u_wind
         v += v_wind
-        # print('U AFTER wind', u.shape if not np.isscalar(u) else u, np.max(u))
-        # print('V AFTER wind', v.shape if not np.isscalar(v) else v, np.max(v))
 
-        # u = u if u.size > 1 else u.item()
-        # v = v if v.size > 1 else v.item()
-        # w = w if w.size > 1 else w.item()
-
-        #        print('u v w', u.shape, v.shape, w.shape)
         result = np.array([u, v, w]), {}
         self._log.debug('get_velocity; result=%s', result)
 
@@ -395,7 +304,6 @@ class SimpleAirVelocityField(AirVelocityFieldInterface):
             return np.zeros((1 if np.isscalar(z_earth_m) else len(z_earth_m),
                              2)).squeeze()
 
-        # TODO: use time
         t_s = 0.
 
         # generate core horizontal displacement profile

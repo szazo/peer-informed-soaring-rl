@@ -111,7 +111,6 @@ class NeptuneExperimentLogger(ExperimentLoggerInterface):
                         step)
 
         self._resolve_run()[key].append(value=value, step=step)
-        #self._writer.add_scalar(tag=key, scalar_value=value, global_step=step)
 
     def _resolve_run(self) -> neptune.Run:
 

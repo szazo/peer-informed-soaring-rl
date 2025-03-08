@@ -30,11 +30,17 @@
 For logging the experiments and storing trained weights https://neptune.ai/[neptune.ai] is used.
 
 Create a new project and:
-1. set the project id in `config/logger/neptune_logger.yaml` after `project:`
+1. set the workspace/project id in `config/logger/neptune_logger.yaml` after `project:`
 2. set the `NEPTUNE_API_TOKEN` environment variable e.g. in `.bashrc`, `.zshrc` (it can also be set in the config, but not recommended):
 
 ```bash
 export NEPTUNE_API_TOKEN=TOKEN-VALUE
+```
+
+# Run unit tests
+
+```
+make unittest
 ```
 
 # Plot gaussian thermals
@@ -57,7 +63,7 @@ make train_single
 
 ## Run train with multiple parameters
 
-Run multiple training jobs with different sequence lengths:
+You can run multiple training jobs with different sequence lengths (see `hydra/sweeper/params` in `config/train_multirun_config.yaml`):
 
 ```bash
 make train_multirun
@@ -66,7 +72,7 @@ make train_multirun
 # Multi-Agent training
 
 - Set `POLICY_NEPTUNE_ID` to the Neptune Run ID which contains the trained single agent teacher policy.
-- Set `SEQ_LENGTH` to the sequence length matches the trained teacher policy.
+- Set `SEQ_LENGTH` to the sequence length matches the trained teacher policy's (see `parameters/model/transformer_net/max_sequence_length` in Neptune).
 - Set `AGENT_SEQ_LENGTH` to the number of agents student use trajectories from (including itself).
 
 ```bash
@@ -92,7 +98,7 @@ First, generate reproducible evaluation configurations for gaussian thermals:
 make generate_gaussian_thermal_eval_configs
 ```
 
-## Teacher Evaluation
+## Teacher (Single-Agent) Evaluation
 
 Evaluate the trained teacher policy using the reproducible configs.
 
@@ -111,12 +117,12 @@ POLICY_NEPTUNE_ID=GLID-4517 SEQ_LENGTH=50 make eval_multi_agent_teacher_all
 Observation logs will be created under `results/eval/gaussian/multi_agent_policy`.
 
 
-## Student Evaluation
+## Student (Multi-Agent Environment) Evaluation
 
-Evaluate the trained teacher policy using the reproducible configs.
+Evaluate the trained student policy using the reproducible configs.
 
 - Set `POLICY_NEPTUNE_ID` to the Neptune Run ID which contains the trained policy.
-- Set `POLICY_CHECKPOINT_NAME` to the checkpoint of the run (under `checkpoint` key) to be used e.g. `weights42` (select e.g. based on `checkpoint/mean_minus_std` metrics)
+- Set `POLICY_CHECKPOINT_NAME` to the checkpoint of the run (under `checkpoint` key in Neptune) to be used, e.g. `weights42` (select e.g. based on `checkpoint/mean_minus_std` metrics)
 - Set `SEQ_LENGTH` to the sequence length matches the policy.
 - Set `AGENT_SEQ_LENGTH` to the agent sequence length matches the policy.
 
@@ -136,7 +142,7 @@ Observation logs will be created under `results/eval/gaussian/multi_agent_policy
 The observations can be played in the 3D interactive player using e.g. the following command:
 
 ```
- OBS_LOG_FILEPATH=results/eval/gaussian/multi_agent_policy/multi_agent_eval_student_with_teachers_350m.csv  make play_observation_log
+OBS_LOG_FILEPATH=results/eval/gaussian/multi_agent_policy/multi_agent_eval_student_with_teachers_350m.csv  make play_observation_log
 ```
 
 More settings can be set in `config/play_observation_log_config.yaml`

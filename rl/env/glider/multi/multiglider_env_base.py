@@ -86,7 +86,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
         self._visualization = visualization
 
         self.possible_agents = self._create_possible_agents()
-        # self.agents = None
         self._agent_instances = {}
         self._deleted_agent_instances = {}
 
@@ -110,8 +109,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
         seed: int | None = None,
         options: dict | None = None
     ) -> tuple[dict[AgentID, ObsType], dict[AgentID, dict]]:
-
-        print('ENV_RESET', self)
 
         self._log.debug('reset; seed=%s,options=%s', seed, options)
 
@@ -141,12 +138,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
                            global_agent_count=len(self._agent_instances))
 
         assert len(self._agent_instances) > 0, 'no agent created at reset'
-        # max_agents = np.random.randint(len(self.possible_agents)) + 1
-        # for agent_id in self.possible_agents:
-
-        #     max_agents -= 1
-        #     if max_agents == 0:
-        #         break
 
         # agents created, return the observation and info
         obs = self._get_observation(t_s=self._time_params.initial_time_s)
@@ -154,9 +145,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
 
         self._log.debug('observations=%s', obs)
         self._log.debug('info=%s', info)
-
-        # self.agents = agents
-        # print('AGENTS AFTER RESET', self.agents)
 
         return obs, info
 
@@ -180,7 +168,7 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
             created_agent_ids += agent_ids_to_create
 
         if len(created_agent_ids) > 0:
-            print('created_agent_ids', created_agent_ids)
+            self._log.debug('created_agent_ids=%s', created_agent_ids)
         return created_agent_ids
 
     def _create_instance(
@@ -188,7 +176,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
             initial_conditions_calculator: GliderInitialConditionsCalculator):
 
         self._log.debug('creating agent; id=%s', agent_id)
-        # print('CREATING AGENT', agent_id)
 
         # cutoff / reward calculator
         cutoff_calculator = GliderCutoffCalculator(self._cutoff_params,
@@ -208,7 +195,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
         glider_agent.reset(time_s=current_time_s)
 
         self._agent_instances[agent_id] = glider_agent
-        # print('agent created', self._agent_instances)
 
     @property
     def agents(self) -> list[AgentID]:
@@ -227,7 +213,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
         assert len(self.agents
                    ) > 0, 'Environment has been already finished, call reset'
 
-        # print('step', actions)
         self._log.debug('step; actions=%s', actions)
 
         current_state = self._state
@@ -239,44 +224,14 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
         terminations: dict[AgentID, bool] = {}
         truncations: dict[AgentID, bool] = {}
 
-        # print('actions', actions)
         agents_to_delete = []
         # iterate over the agents and step them
 
         for agent_id in self.agents:
-            # for agent_id, agent_action in actions.items():
-
-            #            print('agent id in', agent_id, agent_id in self._agent_instances)
-            #            print('agent id ', agent_id, np.isnan(agent_action), agent_action == np.NaN, agent_action != np.NaN)
-
-            # if agent_id not in self._agent_instances and not np.isnan(agent_action):
-            #     print('ACTIONS:', agent_id, actions)
-            #     print('AGENTS:', agent_id, self._agent_instances.keys())
-
-            # if agent_id not in self._agent_instances:
-            #     continue
-
             agent_action = actions[agent_id]
 
             assert agent_action is not None and not np.isnan(
                 agent_action), f'missing action for agent {agent_id}'
-
-            # if np.isnan(agent_action):
-            #     # agent is in the instances, however we have no yet valid action,
-            #     # use the default action
-            #     print('nan action', agent_id, agent_action)
-            #     continue
-
-            # assert not np.isnan(agent_action), f'agent action for {agent_id} is nan'
-
-            # assert (agent_id in self._agent_instances and not np.isnan(agent_action)) or \
-            #     (agent_id not in self._agent_instances and np.isnan(agent_action)), f'Invalid action {agent_action} for agent {agent_id}.'
-
-            # if np.isnan(agent_action):
-            #     continue
-
-            # find the agent instance
-            # assert agent_id in self._agent_instances, f'Agent with id {agent_id} not found in instances'
 
             agent_instance = self._agent_instances[agent_id]
             reward_cutoff_result = agent_instance.step(
@@ -291,19 +246,17 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
             truncations[agent_id] = truncated
 
             if reward_cutoff_result.reason != 'none':
-                print('RESULT', agent_id, reward_cutoff_result.reason)
+                self._log.debug('cutoff reason; %s=%s', agent_id,
+                                reward_cutoff_result.reason)
 
             agent_done = terminated or truncated
 
             if agent_done:
                 # delete the instance
                 agents_to_delete.append(agent_id)
-                # print('deleting agent', agent_id, agent_action)
 
             # store the reward even the agent is deleted
             rewards[agent_id] = reward_cutoff_result.reward
-
-        # print('TERMINATIONS, TRUNCATIONS', terminations, truncations)
 
         agent_count_after_deletion = len(
             self._agent_instances) - len(agents_to_delete)
@@ -322,7 +275,7 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
         # update the new state
         self._state = replace(current_state, t_s=next_time_s)
 
-        # TODO: experimental, logically we should include deleted agents' observation too for one step
+        # REVIEW: it should be true, remove the it
         INCLUDE_DELETED_AGENT_OBSERVATION = True
         if INCLUDE_DELETED_AGENT_OBSERVATION:
             # query the observation before the deletion
@@ -341,7 +294,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
                 break
 
         if global_termination:
-            print('GLOBAL TERMINATION')
             for agent_id in self.agents:
                 truncations[agent_id] = True
 
@@ -370,7 +322,6 @@ class MultiGliderEnvBase(ParallelEnv[AgentID, ObsType, ActionType]):
 
             for group in self._agent_groups:
                 group.spawner.agent_killed(agent_id)
-            print('agent_killed', agent_id)
 
     @functools.cache
     def observation_space(self, agent_id: AgentID) -> gymnasium.spaces.Space:

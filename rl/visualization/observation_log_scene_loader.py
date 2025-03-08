@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import pandas as pd
 import numpy as np
 from utils import RandomGeneratorState
@@ -115,7 +114,6 @@ class ObservationLogSceneLoader:
         yaw_pitch_roll_rad = np.deg2rad(yaw_pitch_roll_deg)
 
         # should be converted, because created by atan2
-        # yaw_north_up_rad = (current_yaw_pitch_roll_rad[0] + np.pi / 2) % (np.pi * 2)
         east_relative_yaw_rad = (yaw_pitch_roll_rad[:, 0] +
                                  2 * np.pi) % (np.pi * 2)
         east_relative_yaw_rad = east_relative_yaw_rad.reshape(-1, 1)

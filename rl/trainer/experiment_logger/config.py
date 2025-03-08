@@ -11,8 +11,9 @@ class ExperimentLoggerConfigBase(ExperimentLoggerParametersBase):
 
 
 @dataclass(kw_only=True)
-class LocalTensorBoardExperimentLoggerConfig(ExperimentLoggerConfigBase,
-                                             LocalTensorBoardExperimentLoggerParameters):
+class LocalTensorBoardExperimentLoggerConfig(
+        ExperimentLoggerConfigBase,
+        LocalTensorBoardExperimentLoggerParameters):
     _target_: str = 'trainer.experiment_logger.LocalTensorBoardExperimentLogger'
 
 

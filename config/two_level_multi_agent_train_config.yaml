@@ -2,27 +2,25 @@ defaults:
   - job_config
   - env/glider@train_env.env: base_multiglider
   - env/glider@test_env.env: base_multiglider
-  - env/glider/air_velocity_field@train_env.env.air_velocity_field: multi_agent_thermal_wind_turbulence
-  - env/glider/air_velocity_field@test_env.env.air_velocity_field: multi_agent_thermal_wind_turbulence
+  - env/glider/air_velocity_field@train_env.env.air_velocity_field: multi_agent_thermal_wind
+  - env/glider/air_velocity_field@test_env.env.air_velocity_field: multi_agent_thermal_wind
   - env/glider/aerodynamics@train_env.env.aerodynamics: train_glider
   - env/glider/aerodynamics@test_env.env.aerodynamics: train_glider
   - trainer: onpolicy
   - trainer/stop_fn: mean_reward_stop
   - model: multi_agent
-  - logger@model.non_learning.model_source_logger: neptune
+  - logger@model.non_learning.model_source_logger: neptune_logger
   - model@model.learning: ppo_multi_level_transformer
   - model@model.learning.transformer_net: two_level_transformer
   - model/ppo_policy/dist_fn@model.learning.ppo_policy.dist_fn: categorical
   - model/optimizer@model.learning.optimizer: adam
-  - logger: neptune
+  - logger@logger: neptune_logger
   - override hydra/job_logging: custom_logging
   - _self_
 
 experiment_name: multi_agent_train
 
 device: max_memory_cuda
-logger:
-  project: szazo/glider
   
 trainer:
   max_epoch: 200
@@ -38,7 +36,6 @@ model:
   non_learning:
     device: cuda:1
     model_source_logger:
-      project: szazo/glider
       with_existing_id: ???
       readonly: true
   learning_agent_ids:
@@ -69,6 +66,7 @@ model:
           enable_layer_normalization: false
           enable_causal_attention_mask: true
           is_reversed_sequence: true
+          encoder_activation: swish
         peer_sequence_transformer:
           input_dim: 7
           output_dim: 128
@@ -82,6 +80,7 @@ model:
           enable_layer_normalization: false
           enable_causal_attention_mask: true
           is_reversed_sequence: true
+          encoder_activation: swish
         agent_transformer:
           input_dim: ${model.learning.transformer_net.ego_sequence_transformer.output_dim}
           output_dim: 128
@@ -95,6 +94,7 @@ model:
           enable_layer_normalization: false
           enable_causal_attention_mask: true
           is_reversed_sequence: true
+          encoder_activation: swish
     actor_critic_net:
       action_space_n: 13
       actor_hidden_sizes: [128, 128]

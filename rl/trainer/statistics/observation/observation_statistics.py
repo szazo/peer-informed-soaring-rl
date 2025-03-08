@@ -3,14 +3,9 @@ import os
 from dataclasses import dataclass
 import pandas as pd
 import hydra
-# from .api import StatisticsPluginConfigBase, StatisticsPlugin
 from ...experiment_logger import ExperimentLoggerInterface
 from ..api import StatisticsBase
 from .api import ObservationStatisticsPlugin, ObservationStatisticsPluginConfigBase
-
-# @dataclass
-# class StatisticsParameters(StatisticsPluginConfigBase):
-#     pass
 
 
 @dataclass
@@ -48,7 +43,7 @@ class ObservationStatistics(StatisticsBase):
         self._log.debug('creating observation log plugin "%s"...',
                         self._params.plugin._target_)
 
-        # # create the statistics plugin
+        # create the statistics plugin
         stat_plugin: ObservationStatisticsPlugin = hydra.utils.instantiate(
             self._params.plugin, _convert_='object')
 

@@ -143,9 +143,6 @@ class GliderInitialConditionsCalculator():
         # zero dot
         yaw_pitch_roll_earth_to_body_dot_rad_per_s = np.array([0.0, 0.0, 0.0])
 
-        # distance_from_core_m = self._calculate_distance_from_core(
-        #     position_earth_xyz_m, core_position_earth_xy_m)
-
         return position_earth_xyz_m, \
             yaw_pitch_roll_earth_to_body_rad, \
             yaw_pitch_roll_earth_to_body_dot_rad_per_s, \

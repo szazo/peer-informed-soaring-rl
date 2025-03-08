@@ -1,11 +1,7 @@
-from env.glider.base import SimulationBoxParameters
 from utils.custom_job_api import CustomJobBase, CustomJobBaseConfig
 
-from typing import Any
 from dataclasses import dataclass
 import logging
-from omegaconf import MISSING
-from thermal.api import AirVelocityFieldConfigBase, AirVelocityFieldInterface
 from utils.custom_job_api import CustomJobBase, CustomJobBaseConfig
 from visualization.scene_player import ScenePlayer, ScenePlayerParams
 from .observation_log_scene_loader import ObservationLogSceneLoader

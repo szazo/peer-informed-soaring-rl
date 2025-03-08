@@ -1,7 +1,6 @@
 import os
 from dataclasses import dataclass
 import logging
-import hydra
 
 from ..experiment_logger import (ExperimentLoggerConfigBase,
                                  create_experiment_logger)

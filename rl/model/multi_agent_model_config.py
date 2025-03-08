@@ -1,4 +1,3 @@
-from typing import Any
 import logging
 from functools import partial
 from dataclasses import dataclass
@@ -24,7 +23,7 @@ class NonLearningModelConfig(TianshouModelConfigBase):
     _target_: str = 'model.multi_agent_model_config.load_non_learning_model'
 
 
-# TODO: copied from tianshou job base, refactor
+# TODO: refactor
 def _create_policy_model(
     device: torch.device, policy_config: TianshouModelConfigBase
 ) -> partial[tianshou.policy.BasePolicy]:
@@ -44,7 +43,6 @@ def load_non_learning_model(device: str,
 
     _log = logging.getLogger('load_non_learning_model')
 
-    # model_logger_instance = create_experiment_logger(model_source_logger)
     model_logger_instance = model_source_logger
 
     _log.debug('loading parameters from the experiment logger...')
@@ -117,8 +115,6 @@ def create_multi_agent_model(non_learning: partial[tianshou.policy.BasePolicy],
 
     possible_agents = list(observation_space.keys())
 
-    # learning_agent_ids = learning_agent_ids + ['student1', 'student2', 'student3']
-
     policies = {}
     for agent_id in possible_agents:
 
@@ -129,7 +125,7 @@ def create_multi_agent_model(non_learning: partial[tianshou.policy.BasePolicy],
 
         policies[agent_id] = policy
 
-    # # create the multi agent policy manager
+    # create the multi agent policy manager
     multi_agent_policy = ParallelMultiAgentPolicyManager(
         policies=policies,
         learn_agent_ids=learning_agent_ids,

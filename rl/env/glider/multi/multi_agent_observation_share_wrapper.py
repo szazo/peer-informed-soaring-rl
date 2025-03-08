@@ -72,7 +72,6 @@ class ReverseSequenceObservationWrapper(BaseParallelWrapper[AgentIDType,
             sequence_axis = 0
             flipped_obs = np.flip(agent_obs, sequence_axis)
 
-            # print('flipped_obs')
             result[agent_id] = cast(ObsType, flipped_obs)
 
         return result
@@ -144,7 +143,6 @@ class SortAgentObservationWrapper(BaseParallelWrapper[AgentIDType, ObsType,
             if self._params.remove_non_meeting_agents:
                 # remove items which has no common points with the self_index
                 mask = np.logical_not(np.isclose(smallest_distances, np.inf))
-                # print('todelete', mask)
 
                 # clear_empty_items_along_axis
                 agent_obs = np.compress(mask,
@@ -152,10 +150,7 @@ class SortAgentObservationWrapper(BaseParallelWrapper[AgentIDType, ObsType,
                                         axis=self._params.item_axis)
 
                 # also filter the distances
-                # print('mask', mask, type(mask), smallest_distances)
                 smallest_distances = smallest_distances[mask]
-
-            # print('SORTED OBS SHAPE BEFORE', agent_obs.shape)
 
             sorted_obs = sort_items_along_axis(
                 agent_obs,
@@ -164,25 +159,13 @@ class SortAgentObservationWrapper(BaseParallelWrapper[AgentIDType, ObsType,
 
             # use only the first maximum number of agents
 
-            assert self._params.item_axis == 1, 'HARD CODED item axis'
+            assert self._params.item_axis == 1
             sorted_obs = sorted_obs[:, :self._params.max_closest_agent_count,
                                     ...]
 
             result[agent_id] = cast(ObsType, sorted_obs)
 
-            # print('SORTED OBS SHAPE', sorted_obs.shape)
-            # assert False
-
         return result
-
-        # result_obs: dict[AgentIDType, ObsType] = {}
-        # for agent_id in self.agents:
-        #     result_obs[agent_id] = obs[agent_id]
-
-        # return result_obs
-
-    def _process_observation(self, self_agent_index: int, obs: ObsType):
-        pass
 
 
 def calculate_smallest_distance_between_trajectories(positions1: VectorNxN,
@@ -191,37 +174,24 @@ def calculate_smallest_distance_between_trajectories(positions1: VectorNxN,
     assert positions1.ndim == 2, 'two dimensional input is required'
     assert positions2.ndim == 2, 'two dimensional input is required'
 
-    # print('pos1', positions1, positions1.ndim)
-    # print('pos2', positions2, positions2.ndim)
-
     # filter out steps when any of them is nan along the whole row axis
     isnan1 = np.all(np.isnan(positions1), axis=1)
     isnan2 = np.all(np.isnan(positions2), axis=1)
 
     isnan = np.logical_not(np.logical_or(isnan1, isnan2))
-    # print('isnan', isnan, isnan.shape)
 
     # filter both of them if any of them is nan
     positions1 = positions1[isnan]
     positions2 = positions2[isnan]
 
-    # print('filtered pos1', positions1, positions1.ndim)
-    # print('filtered pos2', positions2, positions2.ndim)
-
     assert positions1.shape == positions2.shape
     if positions1.shape[0] == 0:
         return np.inf
 
-    # print('check', np.isnan(positions2))
-
     diff = positions2 - positions1
     norms = np.linalg.norm(diff, axis=1)
 
-    # print('NORMS', norms, norms.shape)
-
     min = np.min(norms)
-
-    # print('MIN', min)
 
     return min
 
@@ -233,8 +203,6 @@ def sort_items_along_axis(input: np.ndarray, item_axis: int, metric: VectorN):
 
     # take items along the axis
     result = np.take(input, indices=permutation, axis=item_axis)
-
-    # print('permutation', permutation)
 
     return result
 
@@ -259,24 +227,7 @@ def calculate_smallest_distance_for_items_along_axis(input: np.ndarray,
 
         result.append(metric)
 
-    # input_moved = np.moveaxis(input, item_axis, 0)
-    # diff = input_moved - self_item
-
-    # print('input_moved', input_moved)
-    # norms = np.linalg.norm(diff, axis=0)
-    # print('diff', diff)
-    # print('norms', norms)
     return np.array(result)
-
-    # np.apply_along_axis(func, axis=item_axis, arr=input)
-
-    # for i in range()
-
-    # print('items', item)
-
-    # # create metric
-
-    # pass
 
 
 def move_item_along_axis(input: np.ndarray, item_axis: int, source_index: int,
@@ -308,24 +259,15 @@ def clear_empty_items_along_axis(input: np.ndarray,
     axes = list(range(input.ndim))
     axes.remove(axis)
 
-    # print('AXES', axes)
-
     # input_mask = [...,:-1]
     if input_mask is None:
         input_mask = (slice(None))
-
-    # print('INPUT_MASK', input_mask)
-    # input_mask = (slice(None))
-
-    # input_mask = (slice(None), slice(None), slice(None, -1))
 
     # create the mask
     equal_nan = np.isnan(empty_value)
     mask = np.logical_not(
         np.all(np.isclose(input[input_mask], empty_value, equal_nan=equal_nan),
                axis=tuple(axes)))
-
-    # print('MASK', mask.shape)
 
     # apply the mask along the axis
     clean = np.compress(mask, input, axis=axis)
@@ -663,12 +605,6 @@ class RemoveNonExistentAgentObservationWrapper(BaseParallelWrapper[AgentIDType,
                                                        ActType]):
     """Only includes agent observations which are in the current agent list of before after step"""
 
-    # def __init__(self, env: pettingzoo.ParallelEnv[AgentIDType, ObsType, ActType]):
-
-    #     super().__init__(env)
-
-    #     self._agent_id_to_index_map = create_agent_id_index_mapping(env)
-
     def reset(
         self,
         seed: int | None = None,
@@ -697,8 +633,6 @@ class RemoveNonExistentAgentObservationWrapper(BaseParallelWrapper[AgentIDType,
         final_agents = set(self.agents)
         required_agents = original_agents | final_agents
 
-        # print('original_agents', original_agents, final_agents, required_agents)
-
         obs = self._modify_obs(obs, list(required_agents))
 
         return obs, reward, terminated, truncated, info
@@ -706,13 +640,9 @@ class RemoveNonExistentAgentObservationWrapper(BaseParallelWrapper[AgentIDType,
     def _modify_obs(self, obs: dict[AgentIDType, ObsType],
                     required_agents: list[AgentIDType]):
 
-        # print('BEFORE REMOVE', obs)
-
         result_obs: dict[AgentIDType, ObsType] = {}
         for agent_id in required_agents:
             result_obs[agent_id] = obs[agent_id]
-
-        # print('AFTER REMOVE', result_obs)
 
         return result_obs
 
@@ -772,57 +702,15 @@ def append_multi_agent_item_index_obs_wrapper(env: EnvType, item_axis: int,
                 self,
                 obs_space: gymnasium.spaces.Box) -> gymnasium.spaces.Space:
 
-            # print('obs space before', obs_space)
-
             return obs_space
 
-            print('obs space after', obs_space)
-
     return shared_wrapper(env, AppendMultiAgentItemIndexObservationModifier)
-
-
-# def clear_empty_items_obs_wrapper(
-#     env: gymnasium.Env | pettingzoo.ParallelEnv | pettingzoo.AECEnv,
-#     params: ClearEmptyItemsObsParams
-# ) -> gymnasium.Env | pettingzoo.ParallelEnv | pettingzoo.AECEnv:
-
-#     class ClearEmptyItemsObservationModifier(BaseModifier):
-
-#         def __init__(self):
-#             super().__init__()
-
-#             self._log = logging.getLogger(__class__.__name__)
-
-#         def modify_obs(self, obs: np.ndarray) -> np.ndarray:
-#             self._log.debug("modify_obs; obs=%s", obs)
-
-#             result_obs = clear_empty_items_along_axis(
-#                 obs, axis=params.axis, empty_value=params.empty_value)
-
-#             self._log.debug("modify_obs; new_shape=%s, new_obs=%s",
-#                             result_obs.shape, result_obs)
-
-#             return result_obs
-
-#     return shared_wrapper(env, ClearEmptyItemsObservationModifier)
 
 
 class MultiAgentObservationShareWrapper(BaseParallelWrapper[AgentIDType,
                                                             ObsType, ActType],
                                         Generic[AgentIDType, ObsType,
                                                 ActType]):
-
-    # egy uj dimenziot ad az observation-hoz, ahol a tobbi agent observation-jeit adja
-    # a dimenzion belul az egyes indexek jelentik az egyes agent-eket
-    # minden agent-hez legyartja minden masik agent-re
-    # igazabol ebben a lepesben, minden agent observation-je megegyezo lesz
-    # az observation-hoz hozzafuzzuk az agent id-jet, pl. (egy int float-kent, vagy one hot encoding-kent)
-    # ezutan a window-ing vegigmegy
-    # majd ezutan johet az a lepes, hogy kidobjuk a teljesen ureseket
-    # atrajkuk, hogy minden agent-nel onmaga legyen az elso, majd a valamilyen sorrendezes
-    # alapjan sorrendezzuk a tobbit (az ID megmarad), majd kidobjuk egy maximum alapjan a tobbit
-    # ezutan az ID-t első körben eldobhatjuk, elég lesz a sorrend, de majd kesobb lehet, hogy
-    # az ID-ből pl. külön embedding-et lehet csinálni és azt is valahogy felhasználni
 
     _agent_id_to_index_map: dict[AgentIDType, int]
 

@@ -1,4 +1,3 @@
-from torch.nn import parallel
 from ..agent_spawner import AgentSpawnParameters2, AgentSpawner2
 
 

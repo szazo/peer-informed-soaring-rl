@@ -1,12 +1,9 @@
-from env.glider.base import EgocentricSpatialTransformationParameters, apply_observation_wrapper, apply_spatial_transformation_wrapper
+from env.glider.base import EgocentricSpatialTransformationParameters, apply_spatial_transformation_wrapper
 from env.glider.multi.make_multiglider_env import apply_share_wrappers
 import numpy as np
 import gymnasium
 import pettingzoo
 from pytest_mock import MockerFixture
-from utils.vector import VectorNx3
-# from ..sequence_window_observation_wrapper import sequence_window_obs_wrapper, SequenceWindowObsParams
-# from ..pad_sequence_observation_wrapper import pad_sequence_obs_wrapper, PadSequenceObsParams
 
 
 def test_sanity_should_observation_wrappers_should_return_same_result(
@@ -33,27 +30,6 @@ def test_sanity_should_observation_wrappers_should_return_same_result(
         assert np.allclose(single_obs, multi_obs)
         assert single_obs.shape == (2, 7)
         assert multi_obs.shape == (1, 2, 7)
-
-    # print(a)
-    # for obs in single_env_iterator:
-    #     print('OBS', obs)
-
-    # for obs in _env_iterator:
-    #     print('OBS', obs)
-
-    # print(type(single_env_iterator))
-    # return
-
-    # print('single reset', single_env.reset())
-    # print('multi reset', multi_env.reset())
-
-    # print('single step', single_env.step(1.))
-    # print('multi step', multi_env.step({'a0': 1.}))
-
-    # print('single step', single_env.step(1.))
-    # print('multi step', multi_env.step({'a0': 1.}))
-
-    # print('input', input, input.shape)
 
 
 def _multi_agent_iterator(env: pettingzoo.ParallelEnv):

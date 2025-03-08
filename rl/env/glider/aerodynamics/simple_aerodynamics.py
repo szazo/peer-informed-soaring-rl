@@ -10,9 +10,6 @@ class SimpleAerodynamics(AerodynamicsInterface):
         self,
         mass_kg: float,
         wing_area_m2: float,
-        # CD: Callable[[float, float], float],  # alpha, beta -> CD
-        # CL: Callable[[float], float],  # alpha -> CL
-        # CC: Callable[[float], float],  # alpha -> CC
         CD: float,
         CL: float,
         rho_kg_per_m3: float,
@@ -84,25 +81,12 @@ class SimpleAerodynamics(AerodynamicsInterface):
             roll_earth_to_body_rad,
         ] = yaw_pitch_roll_earth_to_body_rad
 
-        # subtract to get airmass relative velocity
-        # velocity_airmass_relative_m_per_s = (
-        #     velocity_earth_m_per_s - wind_velocity_earth_m_per_s
-        # )
-
-        # print('velocity_airmass_relative_m_per_s', velocity_airmass_relative_m_per_s, np.linalg.norm(velocity_airmass_relative_m_per_s))
-
-        # angle_of_attack_wind_to_body_rad = pitch_earth_to_body_rad  # same here
-        bank_angle_earth_to_wind_rad = roll_earth_to_body_rad  # same here
-        # sideslip_angle_wind_to_body_rad = 0  # no sideslip in this model
-
-        # calculate CD and CL using angle of attack and sideslip angle
-        CD = self._CD
-        CL = self._CL
+        bank_angle_earth_to_wind_rad = roll_earth_to_body_rad
 
         # we have the heading
         heading_earth_to_body_rad = self.get_new_heading(
             velocity_airmass_relative_m_per_s, bank_angle_earth_to_wind_rad,
-            CL, dt_s)
+            self._CL, dt_s)
 
         # calculate the new velocity
         next_velocity_airmass_relative_m_per_s = self._get_new_velocity_vector_components(

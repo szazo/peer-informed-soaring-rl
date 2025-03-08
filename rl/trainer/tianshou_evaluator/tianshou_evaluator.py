@@ -4,7 +4,6 @@ from typing import Any
 import os
 import logging
 import tianshou
-import numpy as np
 import gymnasium
 from tianshou.data import CollectStats
 from utils import cleanup_numpy_from_dictionary

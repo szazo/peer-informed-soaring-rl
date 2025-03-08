@@ -1,4 +1,3 @@
-from env.glider.multi.apply_share_wrappers import normalize_position_by_logaritmic_distance_obs_wrapper
 import gymnasium
 
 from env.glider.base import (apply_discrete_to_continous_wrapper,
@@ -50,11 +49,6 @@ def make_singleglider_env(params: SingleGliderEnvParameters,
         max_sequence_length=params.max_sequence_length,
         egocentric_spatial_transformation=params.
         egocentric_spatial_transformation)
-
-    # # normalize distance
-    # env = normalize_position_by_logaritmic_distance_obs_wrapper(env,
-    #                                                           position_3d_start_column_index=0)
-    # assert isinstance(env, gymnasium.Env)
 
     # discrete to continous action wrapper
     env = apply_discrete_to_continous_wrapper(

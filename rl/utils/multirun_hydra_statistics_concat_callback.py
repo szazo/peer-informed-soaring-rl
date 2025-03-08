@@ -64,8 +64,6 @@ class MultirunHydraStatisticsConcatCallback(Callback):
                                       index_col=self._input.index_column,
                                       header=header_param)
 
-                # drop the first index column
-                # stat_df.drop([0], axis=1, inplace=True)
                 output_df = pd.concat([output_df, stat_df], axis=0)
 
         target_dir = None

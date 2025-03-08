@@ -35,7 +35,6 @@ GliderAgentActType = float
 @dataclass
 class GliderAgentParameters:
     roll_control_dynamics_params: ControlDynamicsParams | None = None
-    #field(default_factory=default_roll_control_dynamics_params)
     default_action: GliderAgentActType = 0.0
     air_velocity_post_process: AirVelocityPostProcessorParams = field(
         default_factory=AirVelocityPostProcessorParams)

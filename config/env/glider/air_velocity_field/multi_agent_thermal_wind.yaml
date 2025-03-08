@@ -28,14 +28,6 @@ thermal:
   radius_k: 1.5
 
 turbulence:
-# turbulence:
-#   noise_multiplier_normal_mean: 1.2
-#   noise_multiplier_normal_sigma: 0.2
-#   noise_gaussian_filter_sigma_normal_mean_m: 20.0
-#   noise_gaussian_filter_sigma_normal_sigma_m: 5.0
-#   noise_grid_spacing_m: 100.0
-#   sigma_k: 2.5
-
 
 wind:
   horizontal_wind_speed_at_2m_m_per_s_normal_mean: 0.8

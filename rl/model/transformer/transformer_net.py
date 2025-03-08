@@ -4,9 +4,6 @@ from typing import Dict, Any, Optional, Union
 from .convert_input_to_torch import convert_input_to_torch
 import numpy as np
 import torch
-from tianshou.data import to_torch
-from torch.types import Device
-from utils.gradient_visualizer import render_gradient
 from .transformer import Transformer
 from .create_causal_attention_mask import create_causal_attention_mask
 from .positional_encoding import PositionalEncoding
@@ -192,11 +189,5 @@ class TransformerNet(torch.nn.Module):
 
         result = gathered.squeeze(dim=-2)
         log.debug("result %s %s", result, result.shape)
-
-        # assert isinstance(result, torch.Tensor)
-        # if result.requires_grad:
-        #     render_gradient(result, dict(self.named_parameters()),
-        #                     filename='graph')
-        #     raise Exception('stopit')
 
         return result, state

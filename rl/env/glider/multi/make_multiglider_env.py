@@ -24,11 +24,6 @@ def make_multiglider_env(
         air_velocity_field: AirVelocityFieldInterface,
         aerodynamics: AerodynamicsInterface) -> ParallelPettingZooEnv:
 
-    # glider_reward_and_cutoff_calculator = GliderRewardAndCutoffCalculator(
-    #     reward_params=params.reward_params,
-    #     cutoff_params=params.cutoff_params,
-    #     simulation_box=params.simulation_box_params)
-
     # sort the agent groups by order
     sorted_agent_groups = sorted(params.agent_groups.items(),
                                  key=lambda item: item[1].order)
@@ -75,27 +70,6 @@ def make_multiglider_env(
     env = apply_observation_wrapper(env)
     assert isinstance(env, pettingzoo.ParallelEnv)
 
-    # # spatial transformation
-    # env = apply_spatial_transformation_wrapper(
-    #     env,
-    #     spatial_transformation=params.spatial_transformation,
-    #     max_sequence_length=params.max_sequence_length,
-    #     egocentric_spatial_transformation=params.
-    #     egocentric_spatial_transformation)
-
-    # discrete to continous action wrapper
-    # TODO: from config
-    # GLIDER_ROLL_ACTION_DISCRETE_COUNT = 13
-    # discrete_params = DiscreteToContinuousDegreesParams(
-    #     low_deg=-45.0,
-    #     high_deg=45.0,
-    #     discrete_count=GLIDER_ROLL_ACTION_DISCRETE_COUNT)
-
-    # env = apply_discrete_to_continous_wrapper(env, params=discrete_params)
-
-    # to warn when nan action received
-    # env = nan_random_v0(env)
-
     env = apply_share_wrappers(
         env,
         max_sequence_length=params.max_sequence_length,
@@ -111,7 +85,6 @@ def make_multiglider_env(
 
     env = ParallelPettingZooEnv[AgentID, GliderAgentObsType,
                                 GliderAgentActType](name=env_name, env=env)
-    # assert isinstance(env, pettingzoo.ParallelEnv)
 
     return env
 

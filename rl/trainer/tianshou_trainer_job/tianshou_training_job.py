@@ -112,6 +112,7 @@ class TianshouTrainingJob(TianshouJobBase):
                 result = asdict(epoch_stats.info_stat)
 
                 if PRINT_MEMORY_INFO:
+                    # REVIEW: it would be better to log these in the experiment logger
                     # print memory info
                     print(
                         f'memory allocated: {torch.cuda.memory_allocated() / (1024 ** 2)} MB'
@@ -268,8 +269,6 @@ class TianshouTrainingJob(TianshouJobBase):
             collector_params=self._params.test_env.collector,
             vectorized_env=test_vectorized_env,
             policy=policy_instance)
-
-        # test_collector.collect(n_episode=1, render=0.001)
 
         self._log.debug('creating trainer...')
         # create tianshou logger on top of experiment logger
