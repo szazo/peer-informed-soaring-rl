@@ -155,4 +155,4 @@ After the teacher and student evaluations, the statistics job can be run using:
 make stat
 ```
 
-This will generate a violin plot (`vertical_velocity.xyz`) and result a table in LaTex (`multi_agent_table.tex`) under `results/stat/multi_agent` directory.
+This will generate a violin plot (`vertical_velocity.xyz`) and produce a table in LaTex (`multi_agent_table.tex`) under `results/stat/multi_agent` directory.
