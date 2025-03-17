@@ -19,7 +19,7 @@ evaluators:
 hydra:
   sweeper:
     params:
-      +eval/gaussian/models/multi_agent_policy: glob(*) # glob(multi_agent_policy_eval1*) #glob(*) # 
+      +eval/gaussian/models/multi_agent_policy: glob(*) # glob(multi_agent_policy_eval1*)
 
   callbacks:
     merge_observation_logs:
