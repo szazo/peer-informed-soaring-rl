@@ -146,3 +146,14 @@ OBS_LOG_FILEPATH=results/eval/gaussian/multi_agent_policy/multi_agent_eval_stude
 ```
 
 More settings can be set in `config/play_observation_log_config.yaml`
+
+# Stat
+
+After the teacher and student evaluations, the statistics job can be run using:
+
+```
+python tools/multi_agent_stat.py
+```
+
+This will generate a violin plot (`vertical_velocity.xyz`) and result a table in LaTex (`multi_agent_table.tex`) under `results/stat/multi_agent` directory.
+
