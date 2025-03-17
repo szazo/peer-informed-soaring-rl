@@ -45,7 +45,7 @@ make unittest
 
 # Plot gaussian thermals
 
-Just for checking for generating a Gaussian thermal plot
+Just for checking, generate a Gaussian thermal plot:
 
 ```
 make plot_gaussian_thermal
@@ -156,4 +156,3 @@ make stat
 ```
 
 This will generate a violin plot (`vertical_velocity.xyz`) and result a table in LaTex (`multi_agent_table.tex`) under `results/stat/multi_agent` directory.
-
