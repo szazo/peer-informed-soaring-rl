@@ -40,3 +40,6 @@ eval_multi_agent_teacher_alone_350m:
 
 play_observation_log:
 	python run_custom_job.py --config-dir config --config-name 'play_observation_log_config' job.observation_log_filepath=${OBS_LOG_FILEPATH}
+
+stat:
+	python tools/multi_agent_stat.py
